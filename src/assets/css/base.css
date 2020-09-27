@@ -1,0 +1,38 @@
+* {
+    padding: 0;
+    margin: 0;
+    font-family: -apple-system, BlinkMacSystemFont, Helvetica Neue, PingFang SC, Microsoft YaHei, Source Han Sans SC, Noto Sans CJK SC, WenQuanYi Micro Hei, sans-serif;
+    font-size: 15px;
+}
+
+.ipt>.el-input__inner {
+    height: 50px !important;
+    line-height: 50px !important;
+    border-color: #999;
+    color: #000;
+}
+
+.ipt>.el-input__inner::placeholder {
+    color: #999;
+}
+
+
+/* 谷歌 */
+
+.ipt>.el-input__inner::-webkit-input-placeholder {
+    color: #999;
+}
+
+
+/* 火狐 */
+
+.ipt>.el-input__inner:-moz-placeholder {
+    color: #999;
+}
+
+
+/*ie*/
+
+.ipt>.el-input__inner:-ms-input-placeholder {
+    color: #999;
+}

@@ -1,0 +1,81 @@
+/* 多媒体查询 */
+
+@media screen and (max-width: 768px) {
+    body {
+        background-color: #eee;
+    }
+    .max-width {
+        display: block;
+    }
+    .min-width {
+        display: none;
+    }
+    .from-login {
+        width: 80% !important;
+    }
+    .box-login {
+        width: 100% !important;
+    }
+    .el-form {
+        min-width: 100% !important;
+    }
+    .main {
+        background: none !important;
+    }
+    .right-logo {
+        position: fixed !important;
+        width: 100%;
+        right: 0;
+        top: 60px;
+        z-index: 66;
+        display: none !important;
+    }
+    .right-logo>ul {
+        display: flex;
+        flex-direction: column;
+        text-align: center;
+    }
+    .el-header {
+        position: fixed !important;
+        top: 0;
+        left: 0;
+        width: 100%;
+        z-index: 66;
+    }
+    .el-main {
+        padding-top: 64px !important;
+    }
+    .el-aside {
+        position: fixed;
+        top: 0;
+        right: 0;
+        width: 100%;
+        z-index: 99;
+        height: 64px;
+    }
+    .el-menu-demo {
+        height: initial !important;
+    }
+    .btn-form>.el-form-item__content {
+        margin-left: 0 !important;
+    }
+    /* 手机端用户列表 */
+    .staff {
+        display: block;
+    }
+}
+
+@media screen and (min-width:768px) {
+    .right-termain {
+        display: none;
+    }
+    .min-width {
+        display: block;
+    }
+    .max-width {
+        display: none;
+    }
+    body {
+        background-color: #fff;
+    }
+}

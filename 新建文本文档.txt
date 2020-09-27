@@ -1,0 +1,5 @@
+login.vue 是登录页
+home.vue 是登录后进入的页面里面调用子组件
+header.vue 是头部组件
+content.vue 是我的渠道界面
+my.vue 我的银行
