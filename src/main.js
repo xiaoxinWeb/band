@@ -11,7 +11,7 @@ import ElementUI from 'element-ui';
 import 'element-ui/lib/theme-chalk/index.css';
 import Vant from 'vant';
 import 'vant/lib/index.css';
-import  { fetchPost, fetchGet, fetchPostJson }  from  './http.js'
+import  { fetchPost, fetchGet, fetDelect, fetchPostJson }  from  './http.js'
 
 
 Vue.use(Vant);
@@ -20,6 +20,7 @@ Vue.use(less)
 Vue.prototype.fetchPost  =  fetchPost
 Vue.prototype.fetchGet  =  fetchGet
 Vue.prototype.fetchPostJson  =  fetchPostJson
+Vue.prototype.fetDelect = fetDelect
     /* eslint-disable no-new */
 new Vue({
     el: '#app',

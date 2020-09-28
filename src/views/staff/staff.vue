@@ -35,17 +35,17 @@
       style="width: 100%"
       >
       <el-table-column
-        prop="num"
+        prop="staff_num"
         label="员工账号"
         >
       </el-table-column>
       <el-table-column
-        prop="name"
+        prop="staff_name"
         label="员工姓名"
         >
       </el-table-column>
       <el-table-column
-        prop="phone"
+        prop="staff_phone"
         label="员工手机号">
       </el-table-column>
       <el-table-column
@@ -108,95 +108,55 @@ import { Toast } from 'vant';
 import floatIng from '../float/float'
 export default {
     components:{
-floatIng
+        floatIng
     },
     data(){
         return{
             isLoading:false,
+            page:1,
+            size:10,
             staffData:[
-                {
-                    id:"1",
-                    num:"admin",
-                    name:"管理员",
-                    phone:"13233208961"
-                },
-                {
-                    id:"5",
-                    num:"admin4",
-                    name:"管理员",
-                    phone:"13233208961"
-                },
-                {
-                    id:"5",
-                    num:"admin4",
-                    name:"管理员",
-                    phone:"13233208961"
-                },
-                {
-                    id:"5",
-                    num:"admin4",
-                    name:"管理员",
-                    phone:"13233208961"
-                },
-                {
-                    id:"5",
-                    num:"admin4",
-                    name:"管理员",
-                    phone:"13233208961"
-                },
-                {
-                    id:"5",
-                    num:"admin4",
-                    name:"管理员",
-                    phone:"13233208961"
-                },
-                {
-                    id:"5",
-                    num:"admin4",
-                    name:"管理员",
-                    phone:"13233208961"
-                },
-                {
-                    id:"5",
-                    num:"admin4",
-                    name:"管理员",
-                    phone:"13233208961"
-                },
-                {
-                    id:"5",
-                    num:"admin4",
-                    name:"管理员",
-                    phone:"13233208961"
-                },
-                {
-                    id:"41",
-                    num:"admi1n",
-                    name:"管理员",
-                    phone:"13233208961"
-                },{
-                    id:"3",
-                    num:"admin2",
-                    name:"管理员",
-                    phone:"13233208961"
-                },
-                {
-                    id:"2",
-                    num:"admin3",
-                    name:"管理员",
-                    phone:"13233208961"
-                }
             ],
             finished:false,
             error:false
         }
     },
+    created(){
+        //获取列表数据
+        this.tableList();
+        console.log("213123")
+
+    },
     methods:{
-        delect(e,index){
+        // 获取列表数据
+        tableList(){
+            const data = {
+                api_token:localStorage.getItem("tokenlo"),
+                page:this.page,
+                size:this.size
+            }
+            this.fetchGet('/liststaff',data).then(res=>{
+               if(res.data.code == 0){
+                //    获取成功
+                this.staffData = res.data.data
+               }
+            })
+        },
+        delect(index,e){
+            
             // 静态删除
-            this.staffData.splice(index,1)
-             Toast('删除成功');
-             this.staffData = this.staffData
-            console.log(e,index);
+            const data = {
+                 api_token:localStorage.getItem("tokenlo"),
+                 id:e.id
+            }
+            this.fetDelect('/delstaff',data).then(res=>{
+                console.log(res)
+            //     this.staffData.splice(index,1)
+            //  Toast('删除成功');
+            //  this.staffData = this.staffData
+            // console.log(e,index);
+            })
+            
            
         },
         // 上拉刷新
@@ -216,6 +176,6 @@ floatIng
         console.log(123)
         this.$refs.componentref.addBtn("12323");
     }
-    }
+    },
 }
 </script>

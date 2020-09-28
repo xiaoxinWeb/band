@@ -34,6 +34,22 @@ export function fetchPostJson(url, params) {
             })
     })
 }
+
+
+export function fetDelect(url, params) {
+    return new Promise((resolve, reject) => {
+        axios.delete(url, params)
+            .then(response => {
+                resolve(response);
+            }, err => {
+                reject(err);
+            })
+            .catch((error) => {
+                reject(error)
+            })
+    })
+}
+
 ////返回一个Promise(发送get请求)
 export function fetchGet(url, param) {
     return new Promise((resolve, reject) => {
@@ -53,4 +69,5 @@ export default {
     fetchGet,
     axios,
     fetchPostJson,
+    fetDelect,
 }

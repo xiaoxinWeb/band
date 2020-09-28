@@ -80,6 +80,7 @@
 
 </template>
 <script>
+import { Toast } from 'vant';
 export default {
         data(){
             return {
@@ -101,19 +102,25 @@ export default {
         methods:{
             // 登录按钮
             login(){
-                const _this = this;
                 // 按钮加载
-                _this.$refs.form.validate((valid)=>{
+                this.$refs.form.validate((valid)=>{
                          if (valid) {
-                        //      _this.btnLoading = true;
-                        //      const data = {
-                        //          name:"admin",
-                        //         password:"123456"
-                        //      }
-                        //    this.fetchPost('/login',data).then(res=>{
-                        //        console.log(res)
-                        //    })
+                             const data = {
+                                 name:this.form.account,
+                                password:this.form.pwd
+                             }
+                           this.fetchPost('/login',data).then(res=>{
+                               if(res.data.code == 0){
+                             this.btnLoading = false;
+                             localStorage.setItem("tokenlo", res.data.data.api_token)
+                                //    登录成功
                         this.$router.push('staff');
+
+                               }else {
+                                   Toast(res.data.message);
+                               }
+                               console.log(res)
+                           })
                          }else {
                              
                          }
