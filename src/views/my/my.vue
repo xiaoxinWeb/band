@@ -6,6 +6,7 @@
 </style>
 <template>
     <div>
+            <el-button  type="primary" @click="addBtn()">添加渠道</el-button>
         <el-table :data="Mydata" style="width: 100%"
         :default-sort = "{prop:'deal', order: 'descending'}"
         >
@@ -82,6 +83,12 @@ export default {
             ],
             search:""
         }
+    },
+    methods:{
+         // 添加渠道跳转页面
+        addBtn(){
+          this.$router.push('my_bank');
+        },
     }
 }
 </script>

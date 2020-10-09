@@ -51,7 +51,7 @@
   active-text-color="#ffd04b">
   <el-menu-item index="/staff">员工列表</el-menu-item>
   <el-menu-item index="/channel">获客渠道</el-menu-item>
-  <el-menu-item index="3">查看所有银行</el-menu-item>
+  <el-menu-item index="/bank">查看所有银行</el-menu-item>
   <el-menu-item index="/my">我的银行</el-menu-item>
 </el-menu>
         </div>

@@ -45,6 +45,27 @@ const router = new Router({
                         require(['../views/channel/channel.vue'], resolve),
                     meta: { title: "渠道" }
                 },
+                {
+                    path: '/add_channel',
+                    name: 'add_channel',
+                    component: resolve =>
+                        require(['../views/add_channel/add_channel.vue'], resolve),
+                    meta: { title: "添加渠道" }
+                },
+                {
+                    path: '/bank',
+                    name: 'bank',
+                    component: resolve =>
+                        require(['../views/bank/bank.vue'], resolve),
+                    meta: { title: "添加银行" }
+                },
+                {
+                    path: '/my_bank',
+                    name: 'my_bank',
+                    component: resolve =>
+                        require(['../views/my_bank/my_bank.vue'], resolve),
+                    meta: { title: "添加银行" }
+                },
 
             ]
         }

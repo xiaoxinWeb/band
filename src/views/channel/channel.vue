@@ -8,43 +8,49 @@
             <!-- 添加渠道 -->
              <el-button  type="primary" @click="addBtn()">添加渠道</el-button>
                <el-table
-      :data="staffData"
+      :data ="channelData"
       style="width: 100%"
       >
        <el-table-column
-        prop="img"
         label="图片">
+        <template slot-scope="scope">
+          <el-image :src="scope.row.channel_img" width="100px" height="100px">
+      <div slot="error" class="image-slot">
+        <i class="el-icon-picture-outline"></i>
+      </div>
+    </el-image>
+        </template>
       </el-table-column>
       <el-table-column
-        prop="name"
+        prop="channel_name"
         label="渠道名称"
         >
       </el-table-column>
       <el-table-column
-        prop="position"
+        prop="channel_position"
         label="联系人职位"
         >
       </el-table-column>
       <el-table-column
-        prop="phone"
+        prop="channel_phone"
         label="联系人电话">
       </el-table-column>
        <el-table-column
-        prop="user_name"
+        prop="channel_user_name"
         label="渠道联系人">
       </el-table-column>
       <el-table-column
       label="成交笔"
       >
       <template slot-scope="scope">
-            {{scope.row.deal}}
+           <el-button type="text">{{scope.row.deal_num}}</el-button>
       </template>
     </el-table-column>
      </el-table>
    <el-pagination
   background
   layout="prev, pager, next"
-  :total="staffData.length">
+  :total="channelData.length">
 </el-pagination>
         </div>
         <!-- 移动端 -->
@@ -55,17 +61,30 @@
 export default {
     data(){
         return{
-            channelData:[
-                    {
-                    img:"",
-                    name:"",
-                    position:"",
-                    phone:"",
-                    user_name:"",
-                    deal:""
-                    },
-            ]
+            channelData:""
         }
+    },
+    mounted(){
+        this.DataList();
+    },
+    methods:{
+        DataList(){
+          const data = {
+             api_token:localStorage.getItem("tokenlo"),
+                page:1,
+                size:10
+          }
+          this.fetchGet('/listStaffChannel',data).then(res=>{
+               if(res.data.code == 0){
+                //    获取成功
+                this.channelData = res.data.data
+               }
+            })
+        },
+        // 添加渠道跳转页面
+        addBtn(){
+          this.$router.push('add_channel');
+        },
     }
 }
 </script>

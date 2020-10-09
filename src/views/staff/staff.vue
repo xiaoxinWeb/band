@@ -65,7 +65,9 @@
    <el-pagination
   background
   layout="prev, pager, next"
-  :total="staffData.length">
+  :total="count"
+ 
+  >
 </el-pagination>
   </div>
      <!-- 移动端联系人 -->
@@ -80,13 +82,15 @@
   :error.sync="error"
   error-text="请求失败，点击重新加载"
   finished-text="没有更多了"
+   @load="onLoad"
+    :offset="10"
 >
-  <van-cell v-for="(item,i) in staffData" :key="i"   :title="item.name">
+  <van-cell v-for="(item,i) in staffData" :key="i"   :title="item.staff_name">
       <div class="staffList">
           <!-- 左边 -->
           <div class="staffLeft">
-              <div class="staffNum">{{item.num}}</div>
-              <div class="staffPhone">{{item.phone}}</div>
+              <div class="staffNum">{{item.staff_num}}</div>
+              <div class="staffPhone">{{item.staff_phone}}</div>
           </div>
           <!-- 右边删除 -->
           <div class="staffRight">
@@ -112,6 +116,8 @@ export default {
     },
     data(){
         return{
+            count:"",
+            loading:false,
             isLoading:false,
             page:1,
             size:10,
@@ -121,15 +127,14 @@ export default {
             error:false
         }
     },
-    created(){
+    mounted(){
         //获取列表数据
-        this.tableList();
-        console.log("213123")
-
+      this.tableList()
     },
     methods:{
+      
         // 获取列表数据
-        tableList(){
+        tableList(e){
             const data = {
                 api_token:localStorage.getItem("tokenlo"),
                 page:this.page,
@@ -138,10 +143,20 @@ export default {
             this.fetchGet('/liststaff',data).then(res=>{
                if(res.data.code == 0){
                 //    获取成功
-                this.staffData = res.data.data
+                this.count = res.data.count
+                if(e == 2){
+                this.staffData = this.staffData.concat(res.data.data);
+                }else {
+                  this.staffData = res.data.data
+                }
                }
             })
         },
+         // 上拉加载更多
+    onLoad(){
+      this.page++;
+     this.tableList(2);
+    },
         delect(index,e){
             
             // 静态删除
@@ -164,18 +179,20 @@ export default {
       setTimeout(() => {
         Toast('刷新成功');
         this.isLoading = false;
-        console.log(1233)
+        this.page = 1;
+        this.tableList();
       }, 1000);
     },
+
     // 添加用户
     addBtn(){
         // 添加增加页面
          this.$router.push('add');
     },
     addBtn2(){
-        console.log(123)
         this.$refs.componentref.addBtn("12323");
-    }
+    },
+
     },
 }
 </script>

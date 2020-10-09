@@ -64,6 +64,25 @@ import { Toast } from 'vant';
 export default {
     
     data(){
+       // 手机号验证
+		var checkPhone = (rule, value, callback) => {
+		    const phoneReg = /^1[3|4|5|6|7|8][0-9]{9}$/
+		    if (!value) {
+		      return callback(new Error('电话号码不能为空'))
+		    }
+		    setTimeout(() => {
+		      
+		      if (!Number.isInteger(+value)) {
+		        callback(new Error('请输入数字值'))
+		      } else {
+		        if (phoneReg.test(value)) {
+		          callback()
+		        } else {
+		          callback(new Error('手机号码格式不正确'))
+		        }
+		      }
+            }, 100)
+        }
         return{
             Addata:{
                 num:"",
@@ -84,7 +103,8 @@ export default {
                    ],
                    phone:[
                        {
-                           required: true, message: '员工手机不能为空', trigger: 'blur'
+                           required: true,validator: checkPhone, trigger: 'blur',
+
                        }
                    ],
                     level: [
@@ -96,7 +116,8 @@ export default {
     
     methods:{
         close(){
-             this.$router.go(-1);
+              // 不刷新页面
+             this.$router.back()
         },
         //提交
         Submit(){
@@ -114,7 +135,7 @@ export default {
                     if(res.data.code == 0){
                         // 添加成功并返回上一页 刷新上一页数据
                         Toast("添加成功");
-                        this.$router.back()
+                       this.$router.go(-1)
                     }
                 })
                 }
