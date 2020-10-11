@@ -1,90 +1,241 @@
 <style lang="less">
-    
+.el-image {
+  width: 60px;
+  height: 60px;
+}
+.el-pagination {
+  display: flex;
+  justify-content: center;
+}
+.btn {
+  display: flex;
+  justify-content: flex-end;
+}
+.neirong {
+  display: flex;
+  flex-direction: column;
+  .el-form-item__label {
+    font-weight: 600;
+  }
+}
+
+.list {
+  border-bottom: 1px solid #d7d7d7;
+}
+.list p {
+  line-height: 40px;
+  display: flex;
+  flex-direction: row;
+  span {
+    width: 80px;
+    text-align: left;
+    display: block;
+    font-weight: 600;
+  }
+}
 </style>
 <template>
-    <div>
-        <!-- pc端  -->
-        <div class="min-width">
-            <!-- 添加渠道 -->
-             <el-button  type="primary" @click="addBtn()">添加渠道</el-button>
-               <el-table
-      :data ="channelData"
-      style="width: 100%"
+  <div>
+    <!-- pc端  -->
+    <div class="min-width">
+      <!-- 添加渠道 -->
+      <el-button type="primary" @click="addBtn()">添加渠道</el-button>
+      <el-table
+        :data="channelData"
+        tooltip-effect="dark"
+        style="width: 100%"
+        height="70vh"
+        @expand-change="expandChange"
       >
-       <el-table-column
-        label="图片">
-        <template slot-scope="scope">
-          <el-image :src="scope.row.channel_img" width="100px" height="100px">
-      <div slot="error" class="image-slot">
-        <i class="el-icon-picture-outline"></i>
-      </div>
-    </el-image>
-        </template>
-      </el-table-column>
-      <el-table-column
-        prop="channel_name"
-        label="渠道名称"
-        >
-      </el-table-column>
-      <el-table-column
-        prop="channel_position"
-        label="联系人职位"
-        >
-      </el-table-column>
-      <el-table-column
-        prop="channel_phone"
-        label="联系人电话">
-      </el-table-column>
-       <el-table-column
-        prop="channel_user_name"
-        label="渠道联系人">
-      </el-table-column>
-      <el-table-column
-      label="成交笔"
+        <el-table-column type="expand">
+          <template slot-scope="scope">
+            <div class="list" v-for="item in child">
+              <p><span>成交金额:</span>{{ item.money }}</p>
+              <p><span>时间:</span>{{ item.addtime }}</p>
+              <p><span>成交备注:</span>{{ item.remarks }}</p>
+            </div>
+          </template>
+        </el-table-column>
+        <el-table-column label="图片">
+          <template slot-scope="scope">
+            <el-image :src="scope.row.channel_img" width="6px" height="60px">
+              <div slot="error" class="image-slot">
+                <i class="el-icon-picture-outline"></i>
+              </div>
+            </el-image>
+          </template>
+        </el-table-column>
+        <el-table-column prop="add_time" label="时间"> </el-table-column>
+        <el-table-column prop="channel_name" label="渠道名称">
+        </el-table-column>
+        <el-table-column prop="channel_position" label="联系人职位">
+        </el-table-column>
+        <el-table-column prop="channel_phone" label="联系人电话">
+        </el-table-column>
+        <el-table-column prop="channel_user_name" label="渠道联系人">
+        </el-table-column>
+        <el-table-column label="成交笔">
+          <template slot-scope="scope">
+            <el-button type="text">{{ scope.row.deal_num }}</el-button>
+          </template>
+        </el-table-column>
+        <el-table-column fixed="right" label="操作" width="100">
+          <template slot-scope="scope">
+            <el-button @click="handleClick(scope.row)" type="text" size="small"
+              >提交</el-button
+            >
+          </template>
+        </el-table-column>
+      </el-table>
+      <el-pagination
+        background
+        layout="prev, pager, next"
+        :total="channelData.length"
       >
-      <template slot-scope="scope">
-           <el-button type="text">{{scope.row.deal_num}}</el-button>
-      </template>
-    </el-table-column>
-     </el-table>
-   <el-pagination
-  background
-  layout="prev, pager, next"
-  :total="channelData.length">
-</el-pagination>
-        </div>
-        <!-- 移动端 -->
-        <div class="max-width">2</div>
+      </el-pagination>
     </div>
+
+    <!-- 模态框 -->
+    <el-dialog
+      title="提交信息"
+      :visible.sync="dialogVisible"
+      :before-close="handleClose"
+      width="40%"
+    >
+      <el-form :model="ruleForm" :rules="rules" ref="ruleForm">
+        <el-form-item prop="clients_user">
+          <el-input
+            v-model="ruleForm.clients_user"
+            placeholder="请输入客户姓名"
+          ></el-input>
+        </el-form-item>
+
+        <el-form-item prop="money">
+          <el-input
+            v-model="ruleForm.money"
+            placeholder="请输入成交金额"
+          ></el-input>
+        </el-form-item>
+        <el-form-item prop="remarks">
+          <el-input
+            v-model="ruleForm.remarks"
+            type="textarea"
+            placeholder="请输入成交备注"
+          ></el-input>
+        </el-form-item>
+
+        <el-form-item class="btn">
+          <el-button @click="dialogVisible = false">取 消</el-button>
+          <el-button type="primary" @click="determine('ruleForm')"
+            >确 定</el-button
+          >
+        </el-form-item>
+      </el-form>
+    </el-dialog>
+    <!-- 移动端 -->
+    <div class="max-width">2</div>
+  </div>
 </template>
 <script>
+import { Toast } from "vant";
 export default {
-    data(){
-        return{
-            channelData:""
+  data() {
+    return {
+      channelData: "",
+      child: "",
+      dialogVisible: false,
+      type: "",
+      id: "",
+      ruleForm: {
+        money: "",
+        remarks: "",
+        clients_user: "",
+      },
+      rules: {
+        money: [{ required: true, message: "请输入成交金额", trigger: "blur" }],
+        clients_user: [
+          { required: true, message: "请输入客户姓名", trigger: "blur" },
+        ],
+        remarks: [
+          { required: true, message: "请输入成交备注", trigger: "blur" },
+        ],
+      },
+    };
+  },
+  mounted() {
+    this.DataList();
+  },
+  methods: {
+    // 点击展开
+    expandChange(row) {
+      const data = {
+        api_token: localStorage.getItem("tokenlo"),
+        type: row.type,
+        id: row.id,
+      };
+      this.fetchGet("/listStaffDeal", data).then((res) => {
+        if (res.data.code == 0) {
+          console.log(res);
+          //    获取成功
+          this.child = res.data.data;
         }
+      });
     },
-    mounted(){
-        this.DataList();
+    DataList() {
+      const data = {
+        api_token: localStorage.getItem("tokenlo"),
+        page: 1,
+        size: 10,
+      };
+      this.fetchGet("/listStaffChannel", data).then((res) => {
+        if (res.data.code == 0) {
+          //    获取成功
+          this.channelData = res.data.data;
+        }
+      });
     },
-    methods:{
-        DataList(){
+    // 添加渠道跳转页面
+    addBtn() {
+      this.$router.push("add_channel");
+    },
+
+    // 点击提交按钮
+    handleClick(e) {
+      console.log(e);
+      this.id = e.id;
+      this.type = e.type;
+      this.dialogVisible = true;
+    },
+    handleClose(done) {
+      this.dialogVisible = false;
+    },
+    determine(ruleForm) {
+      this.$refs[ruleForm].validate((valid) => {
+        if (valid) {
           const data = {
-             api_token:localStorage.getItem("tokenlo"),
-                page:1,
-                size:10
-          }
-          this.fetchGet('/listStaffChannel',data).then(res=>{
-               if(res.data.code == 0){
-                //    获取成功
-                this.channelData = res.data.data
-               }
-            })
-        },
-        // 添加渠道跳转页面
-        addBtn(){
-          this.$router.push('add_channel');
-        },
-    }
-}
+            api_token: localStorage.getItem("tokenlo"),
+            type: this.type,
+            id: this.id,
+            remarks: this.ruleForm.remarks,
+            money: this.ruleForm.money,
+            clients_user: this.ruleForm.clients_user,
+          };
+          this.fetchGet("/staffDeal", data).then((res) => {
+            if (res.data.code == 0) {
+              Toast(res.data.message);
+              this.dialogVisible = false;
+              this.ruleForm.money = "";
+              this.ruleForm.remarks = "";
+              //    获取成功
+            } else {
+              Toast(res.data.message);
+              this.dialogVisible = true;
+            }
+          });
+        } else {
+        }
+      });
+    },
+  },
+};
 </script>
