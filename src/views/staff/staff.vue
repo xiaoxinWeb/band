@@ -1,4 +1,4 @@
-<style lang="less">
+<style lang="less" scoped>
 .staffList {
   width: 100%;
   display: flex;
@@ -22,6 +22,11 @@
   margin-top: 20px;
   text-align: center;
 }
+.el-pagination__total {
+  line-height: 45px;
+  height: 45px;
+}
+
 </style>
 <template>
   <div>
@@ -30,9 +35,9 @@
       <el-button type="primary" @click="addBtn()">添加用户</el-button>
       <!-- pc端表格显示用户 -->
       <el-table :data="staffData" style="width: 100%" height="70vh">
-        <el-table-column prop="staff_num" label="员工账号"> </el-table-column>
-        <el-table-column prop="staff_name" label="员工姓名"> </el-table-column>
-        <el-table-column prop="staff_phone" label="员工手机号">
+        <el-table-column prop="staff_num" min-width="120" label="员工账号"> </el-table-column>
+        <el-table-column prop="staff_name"  min-width="120" label="员工姓名"> </el-table-column>
+        <el-table-column prop="staff_phone"  min-width="120" label="员工手机号">
         </el-table-column>
         <el-table-column label="操作">
           <template slot-scope="scope">
@@ -47,17 +52,24 @@
           </template>
         </el-table-column>
       </el-table>
-      <el-pagination background layout="prev, pager, next" :total="count">
-      </el-pagination>
+         <el-pagination
+      @size-change="handleSizeChange"
+      @current-change="handleCurrentChange"
+      :page-sizes="[10, 20, 30, 40]"
+      background
+      layout="total, sizes, prev, pager, next, jumper"
+      :total="count">
+    </el-pagination>
     </div>
     <!-- 移动端联系人 -->
     <div class="max-width">
       <!-- 浮动按钮 -->
-      <div @click="addBtn2()">
+      <div @click="addBtn()">
         <floatIng ref="componentref"></floatIng>
       </div>
       <van-pull-refresh v-model="isLoading" @refresh="onRefresh">
         <van-list
+         v-model="loading"
           :finished="finished"
           :error.sync="error"
           error-text="请求失败，点击重新加载"
@@ -114,6 +126,7 @@ export default {
   methods: {
     // 获取列表数据
     tableList(e) {
+      this.loading = true
       const data = {
         api_token: localStorage.getItem("tokenlo"),
         page: this.page,
@@ -123,6 +136,7 @@ export default {
         if (res.data.code == 0) {
           //    获取成功
           this.count = res.data.count;
+          this.loading = false
           if (e == 2) {
             this.staffData = this.staffData.concat(res.data.data);
           } else {
@@ -145,7 +159,7 @@ export default {
       this.fetchGet("/delstaff", data).then((res) => {
         console.log(res);
         if (res.data.code == 0) {
-          // this.staffData.splice(index, 1);
+          this.staffData.splice(index, 1);
           Toast("删除成功");
           this.staffData = this.staffData;
         } else {
@@ -168,9 +182,18 @@ export default {
       // 添加增加页面
       this.$router.push("add");
     },
-    addBtn2() {
-      this.$refs.componentref.addBtn("12323");
+  
+
+    // 分页
+    handleCurrentChange(val){
+      this.page = val;
+      this.tableList();
     },
+    handleSizeChange(val){
+      this.size = val;
+      this.tableList();
+    }
+
   },
 };
 </script>

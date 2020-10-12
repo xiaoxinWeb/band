@@ -10,11 +10,13 @@ import less from 'less'
 import ElementUI from 'element-ui';
 import 'element-ui/lib/theme-chalk/index.css';
 import Vant from 'vant';
+import { Overlay } from 'vant';
 import 'vant/lib/index.css';
 import  { fetchPost, fetchGet, fetDelect, fetchPostJson }  from  './http.js'
 
 
 Vue.use(Vant);
+Vue.use(Overlay);
 Vue.use(ElementUI)
 Vue.use(less)
 Vue.prototype.fetchPost  =  fetchPost

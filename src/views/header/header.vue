@@ -67,16 +67,27 @@ export default {
     data() {
       return {
           show:true,
-        activeIndex: '/staff',
+          activeIndex: '/staff',
       };
       
     },
-
+   watch: {
+    $route () {
+      this.setCurrentRoute();
+    }
+  },
+  created(){
+this.setCurrentRoute();
+  },
     methods: {
       handleSelect(key, keyPath) {
         console.log(key, keyPath);
       },
+      setCurrentRoute (){
+         this.activeIndex = this.$route.path
+      }
 
-    }
+    },
+    
   }
 </script>

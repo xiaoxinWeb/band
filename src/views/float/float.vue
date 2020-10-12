@@ -31,10 +31,7 @@
 <script>
 export default {
     methods:{
-        addBtn(e){
-            console.log(e)
-             this.$router.push('add');
-        }
+      
     }
 }
 </script>
