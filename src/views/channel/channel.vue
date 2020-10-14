@@ -255,7 +255,7 @@
     v-model="loading"
     :finished="finished"
     finished-text="没有更多了"
-    @load="onLoad"
+    @load="onloadlist"
   >
 
     <van-cell 
@@ -269,7 +269,7 @@
                   </p>
                 </div>
                 <!-- 内容 -->
-                <div class="move-text">
+                <div class="move-text"  @click="btn(item)">
                   <!-- 左边图片 -->
                   <div class="move-img-left">
                     <van-image :src="item.channel_img" >
@@ -431,6 +431,12 @@ onRefresh(){
       this.$router.push("add_channel");
     },
 
+    btn(e){
+      this.$router.push({name:'see',params:{
+          item:e
+      }});
+    },
+
     // 点击提交按钮
     handleClick(e) {
       console.log(e);
@@ -490,7 +496,8 @@ this.dialogVisible = false;
       this.size = val;
       this.DataList();
     },
-     onLoad() {
+    
+     onloadlist() {
         this.page++;
       this.DataList(2);
     },

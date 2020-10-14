@@ -23,6 +23,10 @@
 .el-icon-circle-close{
   font-size: 40px;
 }
+.el-image {
+  width: 60px;
+  height: 60px;
+}
 </style>
 <template>
   <div>
@@ -46,7 +50,7 @@
     </el-table-column>
    <el-table-column prop="bank"  label="图片" min-width="120">
       <template slot-scope="scope">
-            <el-image :src="scope.row.bank_img" width="6px" height="60px"  :preview-src-list="srcList">
+            <el-image :src="scope.row.bank_img" width="60px" height="60px"  :preview-src-list="srcList">
               <div slot="error" class="image-slot">
                 <i class="el-icon-picture-outline"></i>
               </div>
