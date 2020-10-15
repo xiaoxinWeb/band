@@ -113,6 +113,8 @@ export default {
                                if(res.data.code == 0){
                              this.btnLoading = false;
                              localStorage.setItem("tokenlo", res.data.data.api_token)
+                              localStorage.setItem("level", res.data.data.level)
+                              console.log(res.data.data.level)
                                 //    登录成功
                         this.$router.push('staff');
 

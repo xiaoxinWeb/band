@@ -81,6 +81,13 @@ const router = new Router({
                         require(['../views/bank_list/bank_list.vue'], resolve),
                     meta: { title: "银行列表" }
                 },
+                {
+                    path: '/Inquiry',
+                    name: 'Inquiry',
+                    component: resolve =>
+                        require(['../views/Inquiry/Inquiry.vue'], resolve),
+                    meta: { title: "询单" }
+                },
             ]
         }
     ]

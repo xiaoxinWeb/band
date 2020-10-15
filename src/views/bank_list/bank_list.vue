@@ -1,77 +1,194 @@
-
 <style lang="less">
-    .icon-text {
-        margin-left: 30px;
-    }
+.el-table__expanded-cell {
+.el-form-item {
+  width: 100%;
+  .el-form-item__content {
+    width: 100%;
+      .list-name {
+    display: flex;
+    margin: 10px 0;
+    justify-content: space-between;
+    width: 100%;
+  }
+  }
+}
+}
+.el-select {
+  width: 100%;
+}
+
 </style>
 <template>
-    <div>
-  <div class="custom-tree-container">
-  <div class="block">
-    
-    <el-tree
-      :data="dataList"
+<div>
+   <el-button type="primary" @click="addBtn()">添加银行</el-button>
+  <el-table
+    :data="tableData"
+    style="width: 100%" height="70vh">
+    <el-table-column type="expand">
+      <template slot-scope="props">
+        <el-form label-position="left" inline class="demo-table-expand">
+          <el-form-item >
+            <span v-for="(item,index) in props.row.parent">
+              <div class="list-name">
+                <span>{{item.bank_name}}</span>
+                <el-button  type="text" @click="delect(index,item.id,props.row.parent)">删除</el-button>
+              </div>
+            </span>
+          </el-form-item>
+        </el-form>
+      </template>
+    </el-table-column>
+    <el-table-column
+      label="姓名"
+      width="180"
       >
-      <span class="custom-tree-node" slot-scope="{ node, dataList }">
-        <span>{{dataList }}</span>
-        <span class="icon-text">
-         <i class="el-icon-plus" @click="add(dataList)"></i>
-          <i class="el-icon-delete" @click="remove(node,dataList)"></i>
-        </span>
-      </span>
-    </el-tree>
+      <template slot-scope="scope">
+        <span style="margin-left: 10px">{{ scope.row.bank_name }}</span>
+      </template>
+    </el-table-column>
+    <el-table-column  width="180" label="操作" style="text-aligin:right">
+    
+    </el-table-column>
+  </el-table>
+    <el-pagination
+      @size-change="handleSizeChange"
+      @current-change="handleCurrentChange"
+      :page-sizes="[10, 20, 30, 40]"
+      background
+      layout="total, sizes, prev, pager, next, jumper"
+      :total="count">
+    </el-pagination>
+<el-dialog
+  :visible.sync="centerDialogVisible"
+  width="40%"
+  
+  >
+ <el-form :model="ruleForm" :rules="rules" ref="ruleForm" label-width="100px" class="demo-ruleForm">
+  <el-form-item label="银行名称" prop="bank_name">
+    <el-input v-model="ruleForm.bank_name"></el-input>
+  </el-form-item>
+  <el-form-item label="活动区域" prop="region">
+    <el-select v-model="ruleForm.region" placeholder="请选择活动区域">
+      <el-option v-for="val in tableData" :key="val.id"  :value="val.id" :label="val.bank_name" />
+    </el-select>
+  </el-form-item>
+ 
+  <el-form-item>
+    <el-button type="primary" @click="submitForm('ruleForm')">确定</el-button>
+    <el-button @click="resetForm('ruleForm')">取消</el-button>
+  </el-form-item>
+</el-form>
+</el-dialog>
+  <!-- 弹出框 -->
   </div>
-</div>
-</div>
 </template>
-<script>
- let id = 1000;
 
+<script>
+import { Toast } from "vant";
+import floatIng from "../float/float";
   export default {
     data() {
       return {
-        dataList: '',
+        tableData: "",
+        page:1,
+        size:10,
+         ruleForm:{
+           bank_name:"",
+           region:""
+         },
+         centerDialogVisible:false,
+         rules:{
+            bank_name: [
+            { required: true, message: '请输入银行名称', trigger: 'blur' },
+          ],
+          
+         }
       }
     },
     mounted(){
-        // 获取数据
-        this.Listdata();
+      // 获取列表
+      this.Banklist();
+       
     },
     methods: {
-
-        // 获取数据
-        Listdata(){
-            const data = {
-                api_token: localStorage.getItem("tokenlo"),
-                page:1,
-                size:10
-            }
-                 this.fetchGet("/listBank", data).then((res) => {
-        if (res.data.code == 0) {
-                this.dataList = JSON.parse(JSON.stringify(res.data.data))
-                }
-             });
-        },
-
-        // 添加 
-        add(data){
-            const childList = {
-                id:'2',
-                label:"课程2",
-                children:[]
-            }
-            if(!data.children){
-                this.$set(data, 'children', []);
-            }
-            data.children.push(childList)
-        },
-        // 删除 
-      remove(node, data) {
-        const parent = node.parent;
-        const children = parent.data.children || parent.data;
-        const index = children.findIndex(d => d.id === data.id);
-        children.splice(index, 1);
+      resetForm(formName){
+this.centerDialogVisible = false;
+           this.$refs[formName].resetFields();
       },
+      // 添加银行
+      addBtn(){
+         this.centerDialogVisible = true; 
+      },
+      submitForm(formName){
+         this.$refs[formName].validate((valid) => {
+          if (valid) {
+            const data = {
+              api_token: localStorage.getItem("tokenlo"),
+              bank_name:this.ruleForm.bank_name,
+              p_id:this.ruleForm.region
+            }
+                this.fetchGet("/addBank", data).then((res) => {
+        if (res.data.code == 0) {
+          this.centerDialogVisible = false;
+           this.$refs[formName].resetFields();
+           this.Banklist()
+        }else {
+           Toast(res.data.message);
+        }
+      });
+          } else {
+            console.log('error submit!!');
+            return false;
+          }
+        });
+      },
+      handleEdit(index, row) {
+        console.log(index, row);
+      },
+      handleDelete(index, row) {
+        console.log(index, row);
+      },
+      Banklist(){
+        const data = {
+          api_token:localStorage.getItem("tokenlo"),
+          page:this.page,
+          size:this.size
+        }
+         this.fetchGet("/listBank", data).then((res) => {
+        if (res.data.code == 0) {
+          console.log(res);
+          this.tableData = res.data.data
+          //    获取成功
+        }
+      });
+      },
+      // 删除
+      delect(i,id,its){
+        const data = {
+          api_token:localStorage.getItem("tokenlo"),
+          id:id
+        }
+         this.fetchGet("/delBank", data).then((res) => {
+        if (res.data.code == 0) {
+          console.log(res);
+          Toast('删除成功')
+           its.splice(i,1)
+          //    获取成功
+        }else {
+ Toast(res.data.message);
+        }
+      });
+       
+      },
+      // 分页 
+       handleCurrentChange(val){
+      this.page = val;
+      this.Banklist();
+    },
+    handleSizeChange(val){
+      this.size = val;
+      this.Banklist();
+    },
     }
-  };
+  }
 </script>

@@ -49,13 +49,13 @@
   text-color="#fff"
   :router="true"
   active-text-color="#ffd04b">
-  <el-menu-item index="/staff">员工列表</el-menu-item>
+  <el-menu-item index="/staff" v-if="level != 2">员工列表</el-menu-item>
   <el-menu-item index="/channel">获客渠道</el-menu-item>
-  <el-menu-item index="/bank">查看所有银行</el-menu-item>
-  <el-menu-item index="/bank_list">银行列表</el-menu-item>
+  <el-menu-item index="/bank_list"  v-if="level != 2">银行列表</el-menu-item>
   <el-menu-item index="/my">我的银行</el-menu-item>
+  <el-menu-item index="/Inquiry">询单</el-menu-item>
 </el-menu>
-        </div>
+        </div>  
         <!-- 移动端菜单 -->
         <div class="right-termain hidden-sm-and-up">
             <i class="el-icon-s-unfold" @click="show = !show"></i>
@@ -69,6 +69,7 @@ export default {
       return {
           show:true,
           activeIndex: '/staff',
+          level:1,
       };
       
     },
@@ -76,9 +77,13 @@ export default {
     $route () {
       this.setCurrentRoute();
     }
+    
+     
   },
   created(){
 this.setCurrentRoute();
+  this.level = localStorage.getItem("level");
+  console.log(this.level)
   },
     methods: {
       handleSelect(key, keyPath) {
