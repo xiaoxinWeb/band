@@ -9,6 +9,14 @@
     margin: 10px 0;
     justify-content: space-between;
     width: 100%;
+    span {
+      display: flex;
+      flex: 1;
+    }
+    .el-button--text {
+      display: flex;
+      flex: 1;
+    }
   }
   }
 }
@@ -17,9 +25,21 @@
   width: 100%;
 }
 
+.activeList {
+  display: flex;
+  flex-direction: row;
+  justify-content: space-between;
+  color: #000;
+  line-height: 30px;
+
+}
+.delect {
+  color: red;
+}
 </style>
 <template>
 <div>
+  <div class="min-width">
    <el-button type="primary" @click="addBtn()">添加银行</el-button>
   <el-table
     :data="tableData"
@@ -39,14 +59,14 @@
       </template>
     </el-table-column>
     <el-table-column
-      label="姓名"
-      width="180"
+      label="银行名称"
+    
       >
       <template slot-scope="scope">
         <span style="margin-left: 10px">{{ scope.row.bank_name }}</span>
       </template>
     </el-table-column>
-    <el-table-column  width="180" label="操作" style="text-aligin:right">
+    <el-table-column   label="操作" style="text-aligin:right">
     
     </el-table-column>
   </el-table>
@@ -64,14 +84,15 @@
   
   >
  <el-form :model="ruleForm" :rules="rules" ref="ruleForm" label-width="100px" class="demo-ruleForm">
+   <el-form-item label="银行id" >
+    <el-select v-model="ruleForm.region" placeholder="请选择银行id">
+      <el-option v-for="val in selectList" :key="val.id"  :value="val.id" :label="val.bank_name" />
+    </el-select>
+  </el-form-item>
   <el-form-item label="银行名称" prop="bank_name">
     <el-input v-model="ruleForm.bank_name"></el-input>
   </el-form-item>
-  <el-form-item label="活动区域" prop="region">
-    <el-select v-model="ruleForm.region" placeholder="请选择活动区域">
-      <el-option v-for="val in tableData" :key="val.id"  :value="val.id" :label="val.bank_name" />
-    </el-select>
-  </el-form-item>
+  
  
   <el-form-item>
     <el-button type="primary" @click="submitForm('ruleForm')">确定</el-button>
@@ -79,7 +100,21 @@
   </el-form-item>
 </el-form>
 </el-dialog>
+</div>
   <!-- 弹出框 -->
+
+  <!-- 移动端  -->
+  <div class="max-width">
+      <van-collapse v-model="activeNames" accordion>
+  <van-collapse-item  v-for="(item,index) in tableData" :title="item.bank_name"  :name="index" >
+    <div class="activeList" v-for="(item2,idx) in item.parent ">
+      <span>{{item2.bank_name}}</span>
+      <span class="delect" @click="delect(idx,item.id,item2.parent)">删除</span>
+    </div>
+  </van-collapse-item>
+  
+</van-collapse>
+  </div>
   </div>
 </template>
 
@@ -90,8 +125,11 @@ import floatIng from "../float/float";
     data() {
       return {
         tableData: "",
+        selectList:"",
+        activeNames: ['1'],
         page:1,
         size:10,
+        count:"",
          ruleForm:{
            bank_name:"",
            region:""
@@ -108,9 +146,27 @@ import floatIng from "../float/float";
     mounted(){
       // 获取列表
       this.Banklist();
+      // 获取一级菜单数据
+      this.btnsectClick()
        
     },
     methods: {
+// 获取一级菜单数据
+btnsectClick(){
+const data = {
+          api_token:localStorage.getItem("tokenlo"),
+         
+        }
+         this.fetchGet("/listOneBank", data).then((res) => {
+        if (res.data.code == 0) {
+          this.selectList = res.data.data
+          //    获取成功
+        }else {
+ Toast(res.data.message);
+        }
+      });
+},
+
       resetForm(formName){
 this.centerDialogVisible = false;
            this.$refs[formName].resetFields();
@@ -158,6 +214,7 @@ this.centerDialogVisible = false;
         if (res.data.code == 0) {
           console.log(res);
           this.tableData = res.data.data
+          this.count = res.data.count
           //    获取成功
         }
       });

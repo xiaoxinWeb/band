@@ -116,7 +116,12 @@ export default {
                               localStorage.setItem("level", res.data.data.level)
                               console.log(res.data.data.level)
                                 //    登录成功
+                                if(res.data.data.level == 1){
                         this.$router.push('staff');
+
+                                }else {
+                                    this.$router.push('channel');
+                                }
 
                                }else {
                                    Toast(res.data.message);

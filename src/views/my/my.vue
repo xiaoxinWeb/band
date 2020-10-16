@@ -119,6 +119,12 @@
             placeholder="请输入成交金额"
           ></el-input>
         </el-form-item>
+         <el-form-item  prop="region">
+    <el-select v-model="ruleForm.region" placeholder="请选择状态码">
+      <el-option label="成交" value="1"></el-option>
+      <el-option label="未成交" value="2"></el-option>
+    </el-select>
+    </el-form-item>
         <el-form-item prop="remarks">
           <el-input
             v-model="ruleForm.remarks"
@@ -162,9 +168,13 @@ getRowKeys (row) { //设置row-key只展示一行
         money: "",
         remarks: "",
         clients_user: "",
+        region:"",
       },
       rules: {
         money: [{ required: true, message: "请输入成交金额", trigger: "blur" }],
+        region: [
+            { required: true, message: '请选择状态码', trigger: 'change' }
+          ],
         clients_user: [
           { required: true, message: "请输入客户姓名", trigger: "blur" },
         ],
@@ -264,6 +274,7 @@ this.dialogVisible = false;
             api_token: localStorage.getItem("tokenlo"),
             type: this.type,
             id: this.id,
+             status:this.ruleForm.region,
             remarks: this.ruleForm.remarks,
             money: this.ruleForm.money,
             clients_user: this.ruleForm.clients_user,

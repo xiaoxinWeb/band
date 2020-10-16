@@ -1,4 +1,4 @@
-<style lang="less">
+<style lang="less" scoped>
     .top-btn {
         display: flex;
         flex-direction: row;
@@ -17,6 +17,11 @@
     <div>
             <!-- 开始 -->
             <div class="top-btn">
+               <el-select v-model="value_type" placeholder="请选择">
+                  <el-option label="全部" value=""></el-option>
+    <el-option label="银行" value="1"></el-option>
+      <el-option label="渠道" value="2"></el-option>
+  </el-select>
                  <el-date-picker
       v-model="startTime"
       type="date"
@@ -34,9 +39,14 @@
       :data="DataList"
       style="width: 100%">
       <el-table-column
-        prop="bank_name"
         label="银行名称"
         width="300">
+        <template slot-scope="scope">
+              <div>
+                  {{scope.row.channel_name== undefined?scope.row.bank_name:scope.row.channel_name}}
+                  </div>
+               
+      </template>
       </el-table-column>
       <el-table-column
         prop="clients_user"
@@ -84,7 +94,8 @@ data(){
         endTime:"",
         page:1,
         size:10,
-        DataList:""
+        DataList:"",
+        value_type:""
     }
 
 },
@@ -100,11 +111,15 @@ methods:{
              page:this.page,
              size:this.size,
              startTime:this.startTime,
-             endTime:this.endTime
+             endTime:this.endTime,
+             type:this.value_type
         }
              this.fetchGet("/listDeal", data).then((res) => {
         if (res.data.code == 0) {
                this.DataList = res.data.data
+               this.DataList.forEach(element => {
+                  console.log(element.channel_name)
+               });
                 }
              });
     },

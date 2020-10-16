@@ -11,6 +11,7 @@ import ElementUI from 'element-ui';
 import 'element-ui/lib/theme-chalk/index.css';
 import Vant from 'vant';
 import { Overlay } from 'vant';
+import 'babel-polyfill';
 import 'vant/lib/index.css';
 import  { fetchPost, fetchGet, fetDelect, fetchPostJson }  from  './http.js'
 
@@ -24,6 +25,8 @@ Vue.prototype.fetchGet  =  fetchGet
 Vue.prototype.fetchPostJson  =  fetchPostJson
 Vue.prototype.fetDelect = fetDelect
     /* eslint-disable no-new */
+    //  路由判断登录 根据路由配置文件的参数
+
 new Vue({
     el: '#app',
     router,

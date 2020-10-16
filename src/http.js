@@ -15,9 +15,12 @@ export function fetchPost(url, params) {
                 resolve(response);
             }, err => {
                 reject(err);
+                console.log(err)
+
             })
             .catch((error) => {
                 reject(error)
+                console.log(err)
             })
     })
 }
@@ -28,9 +31,11 @@ export function fetchPostJson(url, params) {
                 resolve(response);
             }, err => {
                 reject(err);
+                console.log(err)
             })
             .catch((error) => {
                 reject(error)
+                console.log(err)
             })
     })
 }
@@ -43,9 +48,11 @@ export function fetDelect(url, params) {
                 resolve(response);
             }, err => {
                 reject(err);
+                console.log(err)
             })
             .catch((error) => {
                 reject(error)
+                console.log(err)
             })
     })
 }
@@ -58,6 +65,7 @@ export function fetchGet(url, param) {
                 resolve(response)
             }, err => {
                 reject(err)
+                console.log(err)
             })
             .catch((error) => {
                 reject(error)

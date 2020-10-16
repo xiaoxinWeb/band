@@ -40,8 +40,11 @@
                 width: 100%;
             }
              .el-select {
-             width: 100%;
-            }
+			 width: 100%;
+			}
+			.ele-st {
+				margin-top: 20px;
+			}
             .el-button {
                 width: 100%;
             }
@@ -64,9 +67,15 @@
 <template>
     <div>
        <el-form  :model="bankaddData"  :rules="rules" ref="bankaddData" label-width="100px" class="demo-ruleForm">
-            <el-form-item label="银行ID"  prop="bank_id">
-             <el-input v-model="bankaddData.bank_id" placeholder="请输入银行ID"></el-input>
-            </el-form-item>
+           <el-form-item label="银行ID" prop="selectList2">
+				<!-- <el-input v-model="bankaddData.bank_id" placeholder="请输入银行ID"></el-input> -->
+				<el-select v-model="bankaddData.selectList1" placeholder="请选择" prop="selectList" @change="select">
+					<el-option v-for="item in bankaddData.selectList" :key="item.id" :label="item.bank_name" :value="item.id"></el-option>
+				</el-select>
+				<el-select v-model="bankaddData.selectList2" placeholder="请选择" class="ele-st">
+					<el-option v-for="item in bankaddData.selectListA" :key="item.id" :label="item.bank_name" :value="item.id"></el-option>
+				</el-select>
+			</el-form-item>
              <el-form-item label="银行联系人" prop="bank_rersonnel_name">
              <el-input v-model="bankaddData.bank_rersonnel_name" placeholder="请输入银行联系人"></el-input>
             </el-form-item>
@@ -99,39 +108,36 @@ import { Toast } from 'vant';
 export default {
     data(){
          // 手机号验证
-		var checkPhone = (rule, value, callback) => {
-		    const phoneReg = /^1[3|4|5|6|7|8][0-9]{9}$/
-		    if (!value) {
-		      return callback(new Error('电话号码不能为空'))
-		    }
-		    setTimeout(() => {
-		      
-		      if (!Number.isInteger(+value)) {
-		        callback(new Error('请输入数字值'))
-		      } else {
-		        if (phoneReg.test(value)) {
-		          callback()
-		        } else {
-		          callback(new Error('手机号码格式不正确'))
-		        }
-		      }
-            }, 100)
-        }
+		 const rulesloginId = (rule, value, callback) => {
+      if (!/^1[34578]\d{9}$/.test(value)) {
+        callback('手机号信息有误')
+      } else {
+        callback()
+      }
+    }
         return{
             bankaddData:{
                     bank_id:"",
                     bank_rersonnel_name:"",
                     bank_rersonnel_phone:"",
-                    imageUrl:"",
+					imageUrl:"",
+					selectList: '',
+				selectListA: '',
+				selectList1: '',
+				selectList2: ''
             },
             rules:{
-                 bank_id:[
-                    {
-                    required: true, message: '银行id不能为空', trigger: 'blur'
-                     }
-                   ],
+				selectList2: [
+					{
+						required: true,
+						message: '请选择银行ID',
+						trigger: 'blur'
+					}
+				],
+                 
                    bank_rersonnel_phone:[
-                        {  required: true,validator: checkPhone, trigger: 'blur',}
+					    {  required: true, message: '手机号不能为空', trigger: 'blur'},
+                        {  alidator: rulesloginId,trigger: 'blur',}
                    ],
                    bank_rersonnel_name:[
                         {
@@ -148,9 +154,34 @@ export default {
             },
             result:"",
         }
-    },
+	},
+	mounted(){
+		this.menu();
+	},
     methods:{
-     
+     select() {
+			this.bankaddData.selectListA = '';
+			this.bankaddData.selectList2 = '';
+			const data = {
+				api_token: localStorage.getItem('tokenlo'),
+				id: this.bankaddData.selectList1
+			};
+			this.fetchGet('/listTwoBank', data).then(res => {
+				if (res.data.code == 0) {
+					this.bankaddData.selectListA = res.data.data;
+				}
+			});
+		},
+		menu() {
+			const data = {
+				api_token: localStorage.getItem('tokenlo')
+			};
+			this.fetchGet('/listOneBank', data).then(res => {
+				if (res.data.code == 0) {
+					this.bankaddData.selectList = res.data.data;
+				}
+			});
+		},
     //  自定义上传图片
       uploadFile(file){
           const _this  = this;
@@ -180,7 +211,7 @@ export default {
                 if(valid){
                     const data = {
                         api_token:localStorage.getItem("tokenlo"),
-                        bank_id:this.bankaddData.bank_id,
+                        bank_id: this.bankaddData.selectList2,
                         bank_rersonnel_name:this.bankaddData.bank_rersonnel_name,
                         bank_rersonnel_phone:this.bankaddData.bank_rersonnel_phone,
                         bank_img:this.bankaddData.imageUrl

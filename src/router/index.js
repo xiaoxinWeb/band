@@ -17,7 +17,7 @@ const router = new Router({
             name: 'home',
             component: resolve =>
                 require(['../components/home.vue'], resolve),
-            meta: { title: '首页' },
+            meta: { title: '首页', requireAuth: true },
             children: [{
                     path: '/my',
                     name: 'my',

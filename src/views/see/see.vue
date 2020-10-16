@@ -13,11 +13,18 @@
            }
        }
    }
+   .zanwu {
+       display: flex;
+       justify-content: center;
+       align-items: center;
+       width: 100%;
+       height: calc(100vh - 70px);
+   }
 </style>
 <template>
     <div>
          <van-cell 
-         v-for="(item, i) in DataList" :key="i">
+         v-for="(item, i) in DataList" :key="i" v-if="DataList.length != 0">
          <div class="list-see">
              <div class="see-text">
                  <h3>姓名:</h3>{{item.clients_user}}
@@ -37,7 +44,9 @@
              
          </div>
          </van-cell>
-        
+        <div class="zanwu" v-if="DataList.length == 0">
+            暂无数据
+        </div>
     </div>
 </template>
 <script>
@@ -66,6 +75,7 @@ export default {
           console.log(res);
           //    获取成功
           this.DataList = res.data.data;
+          console.log(this.DataList.length)
         }
       });
         }

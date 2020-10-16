@@ -19,6 +19,7 @@
   }
 }
 
+
 .list {
   border-bottom: 1px solid #d7d7d7;
 }
@@ -44,6 +45,12 @@
 }
 
 
+.block {
+  color: #070707;
+}
+.red {
+  color: red;
+}
 // 移动端盒子
 .van-cell {
   margin: 10px 0;
@@ -112,6 +119,11 @@
   width: 80%;
     padding: 20px;
 }
+  @media screen and (max-width: 768px){ 
+.el-select {
+  margin-bottom: 21px;
+}
+  }
 </style>
 <template>
   <div>
@@ -130,7 +142,7 @@
       >
         <el-table-column type="expand">
           <template slot-scope="scope">
-            <div class="list" v-for="item in child">
+            <div class="list" v-for="item in child":class="item.status == 1 ? 'block':'red'">
               <p><span>成交金额:</span>{{ item.money }}</p>
               <p><span>时间:</span>{{ item.addtime }}</p>
               <p><span>成交备注:</span>{{ item.remarks }}</p>
@@ -197,6 +209,12 @@
             placeholder="请输入成交金额"
           ></el-input>
         </el-form-item>
+         <el-form-item  prop="region">
+    <el-select v-model="ruleForm.region" placeholder="请选择状态码">
+      <el-option label="成交" value="1"></el-option>
+      <el-option label="未成交" value="2"></el-option>
+    </el-select>
+    </el-form-item>
         <el-form-item prop="remarks">
           <el-input
             v-model="ruleForm.remarks"
@@ -233,6 +251,12 @@
             placeholder="请输入成交金额"
           ></el-input>
         </el-form-item>
+        <el-form-item prop="region">
+         <el-select v-model="ruleForm.region" placeholder="请选择状态码">
+      <el-option label="成交" value="1"></el-option>
+      <el-option label="未成交" value="2"></el-option>
+    </el-select>
+    </el-form-item>
         <el-form-item prop="remarks">
           <el-input
             v-model="ruleForm.remarks"
@@ -339,8 +363,12 @@ export default {
         money: "",
         remarks: "",
         clients_user: "",
+        region:""
       },
       rules: {
+        region: [
+            { required: true, message: '请选择状态码', trigger: 'change' }
+          ],
         money: [{ required: true, message: "请输入成交金额", trigger: "blur" }],
         clients_user: [
           { required: true, message: "请输入客户姓名", trigger: "blur" },
@@ -464,6 +492,7 @@ this.dialogVisible = false;
             api_token: localStorage.getItem("tokenlo"),
             type: this.type,
             id: this.id,
+            status:this.ruleForm.region,
             remarks: this.ruleForm.remarks,
             money: this.ruleForm.money,
             clients_user: this.ruleForm.clients_user,
