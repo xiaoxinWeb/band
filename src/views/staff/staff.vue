@@ -26,7 +26,6 @@
   line-height: 45px;
   height: 45px;
 }
-
 </style>
 <template>
   <div>
@@ -35,9 +34,11 @@
       <el-button type="primary" @click="addBtn()">添加用户</el-button>
       <!-- pc端表格显示用户 -->
       <el-table :data="staffData" style="width: 100%" height="70vh">
-        <el-table-column prop="staff_num" min-width="120" label="员工账号"> </el-table-column>
-        <el-table-column prop="staff_name"  min-width="120" label="员工姓名"> </el-table-column>
-        <el-table-column prop="staff_phone"  min-width="120" label="员工手机号">
+        <el-table-column prop="staff_num" min-width="120" label="员工账号">
+        </el-table-column>
+        <el-table-column prop="staff_name" min-width="120" label="员工姓名">
+        </el-table-column>
+        <el-table-column prop="staff_phone" min-width="120" label="员工手机号">
         </el-table-column>
         <el-table-column label="操作">
           <template slot-scope="scope">
@@ -52,14 +53,15 @@
           </template>
         </el-table-column>
       </el-table>
-         <el-pagination
-      @size-change="handleSizeChange"
-      @current-change="handleCurrentChange"
-      :page-sizes="[10, 20, 30, 40]"
-      background
-      layout="total, sizes, prev, pager, next, jumper"
-      :total="count">
-    </el-pagination>
+      <el-pagination
+        @size-change="handleSizeChange"
+        @current-change="handleCurrentChange"
+        :page-sizes="[10, 20, 30, 40]"
+        background
+        layout="total, sizes, prev, pager, next, jumper"
+        :total="count"
+      >
+      </el-pagination>
     </div>
     <!-- 移动端联系人 -->
     <div class="max-width">
@@ -69,12 +71,11 @@
       </div>
       <van-pull-refresh v-model="isLoading" @refresh="onRefresh">
         <van-list
-         v-model="loading"
+          v-model="loading"
           :finished="finished"
           :error.sync="error"
           error-text="请求失败，点击重新加载"
           finished-text="没有更多了"
-          @load="onLoad"
           :offset="10"
         >
           <van-cell
@@ -117,6 +118,7 @@ export default {
       staffData: [],
       finished: false,
       error: false,
+      finished: false,
     };
   },
   mounted() {
@@ -124,9 +126,13 @@ export default {
     this.tableList();
   },
   methods: {
+    onloadt() {
+      this.page++;
+      this.tableList(2);
+    },
     // 获取列表数据
     tableList(e) {
-      this.loading = true
+      this.loading = true;
       const data = {
         api_token: localStorage.getItem("tokenlo"),
         page: this.page,
@@ -136,20 +142,24 @@ export default {
         if (res.data.code == 0) {
           //    获取成功
           this.count = res.data.count;
-          this.loading = false
+          this.refreshing = false;
+          this.loading = false;
           if (e == 2) {
-            this.staffData = this.staffData.concat(res.data.data);
-          } else {
-            this.staffData = res.data.data;
+            if (res.data.data.length == 0) {
+              this.finished = true;
+            } else {
+              this.staffData = this.staffData.concat(res.data.data);
+              this.finished = false;
+            }
+            return;
           }
+          this.finished = true;
+          this.staffData = res.data.data;
         }
       });
     },
     // 上拉加载更多
-    onLoad() {
-      this.page++;
-      this.tableList(2);
-    },
+
     delect(index, e) {
       // 静态删除
       const data = {
@@ -182,18 +192,16 @@ export default {
       // 添加增加页面
       this.$router.push("add");
     },
-  
 
     // 分页
-    handleCurrentChange(val){
+    handleCurrentChange(val) {
       this.page = val;
       this.tableList();
     },
-    handleSizeChange(val){
+    handleSizeChange(val) {
       this.size = val;
       this.tableList();
-    }
-
+    },
   },
 };
 </script>
