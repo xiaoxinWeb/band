@@ -26,7 +26,11 @@
     .right-show {
         display: block !important;
     }
-      
+      @media screen and (max-width:768px) {
+      .disblock {
+        display: none !important;
+      }
+      }
       .el-menu-demo  {
         display: flex;
         flex-direction: column;
@@ -39,7 +43,7 @@
         <!-- logo -->
         <!-- -->
         <!-- pc端菜单 -->
-        <div class="right-logo all" :class="!show?'right-show':''" v-show="show">
+        <div class="right-logo all" :class="!show?'right-show':'disblock'" v-show="show">
             <el-menu 
   :default-active="activeIndex"
   class="el-menu-demo"
@@ -90,7 +94,9 @@ this.setCurrentRoute();
         console.log(key, keyPath);
       },
       setCurrentRoute (){
-         this.activeIndex = this.$route.path
+         this.activeIndex = this.$route.path;
+         this.show= true;
+         console.log("213213")
       }
 
     },

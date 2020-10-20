@@ -35,7 +35,7 @@
   <el-header>
       <!-- <Header /> -->
        <div class="logo">
-              LOGO
+             <img src="../assets/img/logo.png">
         </div> 
   </el-header>
   <div class="box-conter">

@@ -216,6 +216,13 @@
       <div @click="addBtn()">
         <floatIng ref="componentref"></floatIng>
       </div>
+      <van-pull-refresh v-model="isLoading"  @refresh="onRefresh">
+        <van-list
+  v-model="loading"
+  :finished="finished"
+  finished-text="没有更多了"
+  @load="onLoad"
+>
       <van-cell v-for="(item, index) in Mydata" :key="index">
         <div class="move-box">
           <!-- 头部 -->
@@ -251,6 +258,8 @@
           </div>
         </div>
       </van-cell>
+      </van-list>
+      </van-pull-refresh>
       <van-overlay :show="show">
         <el-form :model="ruleForm" :rules="rules" ref="ruleForm">
           <el-form-item prop="clients_user">
@@ -303,6 +312,9 @@ export default {
       count: "",
       show: false,
       error: false,
+       loading: false,
+      finished: false,
+      isLoading:false,
       srcList: [],
       expands: [], //只展开一行放入当前行id
       getRowKeys(row) {
@@ -339,16 +351,39 @@ export default {
   },
   mounted() {
     // 获取初始数据
+    this.srcList= []
     this.my_data();
   },
   methods: {
     // 添加渠道跳转页面
+    btn(e) {
+      this.$router.push({
+        name: "see_my",
+        params: {
+          item: e,
+        },
+      });
+    },
+    // 加载更多
+    onLoad(){
+      this.page++;
+      this.size = 10;
+      this.my_data(2);
+    },
     addBtn() {
       this.$router.push("my_bank");
     },
-
+    onRefresh(){
+       setTimeout(() => {
+        Toast('刷新成功');
+        this.page = 1;
+        this.size = 10;
+        this.srcList= []
+        this.my_data();
+      }, 1000);
+    },
     //获取列表数据
-    my_data() {
+    my_data(e) {
       const data = {
         api_token: localStorage.getItem("tokenlo"),
         page: this.page,
@@ -356,10 +391,20 @@ export default {
       };
       this.fetchGet("/listStaffBank", data).then((res) => {
         if (res.data.code == 0) {
-          this.Mydata = res.data.data;
+          this.loading = false;
+          if(res.data.data.length == 0){
+            this.finished = true;
+            return
+          }
+          this.Mydata = res.data.data
+          if(e == 2){
+          this.Mydata = this.Mydata.concat(res.data.data);
+            
+          }
           this.count = res.data.count;
           //    获取成功
           const ArrayList = this.Mydata;
+          this.isLoading = false;
           ArrayList.forEach((item) => {
             this.srcList.push(item.bank_img);
           });
