@@ -1,4 +1,4 @@
-<style lang="less" >
+<style lang="less" scoped>
 .el-table__expanded-cell {
   .el-form-item {
     width: 100%;
@@ -20,6 +20,17 @@
       }
     }
   }
+}
+.el-input {
+  width: 80%;
+}
+.el-select {
+  width: 80% !important;
+}
+.el-pagination {
+  display: flex;
+  justify-content: center;
+  margin-top: 30px;
 }
 .el-select {
   width: 100%;
@@ -48,10 +59,20 @@
     width: 90%;
     margin: auto;
   }
+  .el-input {
+    width: 60% !important;
+  }
+  .el-select {
+    width: 60% !important;
+  }
   .el-form {
     background-color: #fff;
     padding: 20px 10px;
   }
+}
+.right-text {
+  color: red;
+  margin-right: 10px;
 }
 </style>
 <template>
@@ -83,6 +104,9 @@
           </template>
         </el-table-column>
         <el-table-column label="操作" style="text-aligin: right">
+          <template slot-scope="scope">
+            <span style="color: red" @click="delect2(scope.row)">删除</span>
+          </template>
         </el-table-column>
       </el-table>
       <el-pagination
@@ -293,11 +317,32 @@ export default {
       });
     },
     // 删除
+    delect2(item) {
+      console.log(item);
+      this.$confirm("删除后也会删除子级里面所以支行")
+        .then((_) => {
+          const data = {
+            api_token: localStorage.getItem("tokenlo"),
+            id: item.id,
+          };
+          this.fetchGet("/delBank", data).then((res) => {
+            if (res.data.code == 0) {
+              this.$router.go(0);
+              //    获取成功
+            } else {
+              Toast(res.data.message);
+            }
+          });
+        })
+        .catch((_) => {});
+    },
     delect(i, id, its) {
+      console.log(i, id, its);
       const data = {
         api_token: localStorage.getItem("tokenlo"),
         id: id,
       };
+
       console.log(its);
       this.fetchGet("/delBank", data).then((res) => {
         if (res.data.code == 0) {

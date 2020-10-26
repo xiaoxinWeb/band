@@ -1,4 +1,9 @@
 <style lang="less" scoped>
+.el-pagination {
+  display: flex;
+  justify-content: center;
+  margin-top: 30px;
+}
 .el-input--mini .el-input__inner {
   height: 40px !important;
   line-height: 40px !important;
@@ -138,9 +143,13 @@
           </template>
         </el-table-column>
         <el-table-column prop="add_time" label="时间"> </el-table-column>
-        <el-table-column prop="bank_rersonnel_name" label="相关银行名称">
+        <el-table-column prop="bank_rersonnel_name" label="银行人员名称">
+        </el-table-column>
+        <el-table-column prop="bank_name" label="银行相关名称">
         </el-table-column>
         <el-table-column prop="bank_rersonnel_phone" label="银行人员联系方式">
+        </el-table-column>
+        <el-table-column prop="staff_name" v-if="level == 1" label="负责人">
         </el-table-column>
         <el-table-column prop="deal_num" sortable label="成交笔数">
         </el-table-column>
@@ -155,6 +164,12 @@
           <template slot-scope="scope">
             <el-button @click="handleClick(scope.row)" type="text" size="small"
               >提交</el-button
+            >
+            <el-button type="text" size="small" @click="visit(scope.row)"
+              >拜访</el-button
+            >
+            <el-button type="text" size="small" @click="see(scope.row)"
+              >查看</el-button
             >
           </template>
         </el-table-column>
@@ -216,49 +231,62 @@
       <div @click="addBtn()">
         <floatIng ref="componentref"></floatIng>
       </div>
-      <van-pull-refresh v-model="isLoading"  @refresh="onRefresh">
+      <van-pull-refresh v-model="isLoading" @refresh="onRefresh">
         <van-list
-  v-model="loading"
-  :finished="finished"
-  finished-text="没有更多了"
-  @load="onLoad"
->
-      <van-cell v-for="(item, index) in Mydata" :key="index">
-        <div class="move-box">
-          <!-- 头部 -->
-          <div class="move-title">
-            <h3>{{ item.bank_rersonnel_name }}</h3>
-            <p>{{ item.add_time }}</p>
-          </div>
-          <!-- 内容 -->
-          <div class="move-text" @click="btn(item)">
-            <!-- 左边图片 -->
-            <div class="move-img-left">
-              <van-image :src="item.bank_img"> </van-image>
-            </div>
-            <!-- 内容 -->
-            <div class="move-text-right">
-              <!-- 联系人 -->
-              <div class="move-name">
-                <span>{{ item.bank_rersonnel_phone }}</span>
+          v-model="loading"
+          :finished="finished"
+          finished-text="没有更多了"
+          @load="onLoad"
+        >
+          <van-cell v-for="(item, index) in Mydata" :key="index">
+            <div class="move-box">
+              <!-- 头部 -->
+              <div class="move-title">
+                <h3>{{ item.bank_rersonnel_name }}</h3>
+                <p>{{ item.add_time }}</p>
               </div>
-              <!-- 成交笔 -->
-              <div class="move-num">{{ item.deal_num }}</div>
+              <!-- 内容 -->
+              <div class="move-text" @click="btn(item)">
+                <!-- 左边图片 -->
+                <div class="move-img-left">
+                  <van-image :src="item.bank_img"> </van-image>
+                </div>
+                <!-- 内容 -->
+                <div class="move-text-right">
+                  <!-- 联系人 -->
+                  <div class="move-name">
+                    <div v-if="level == 1">{{ item.staff_name }}</div>
+                    <div>{{ item.bank_name }}</div>
+                    <span>{{ item.bank_rersonnel_phone }}</span>
+                  </div>
+                  <!-- 成交笔 -->
+                  <div class="move-num">{{ item.deal_num }}</div>
+                </div>
+              </div>
+              <!-- 提交按钮 -->
+              <div class="move-btn">
+                <van-button
+                  round
+                  type="danger"
+                  size="small"
+                  @click="handleClick2(item)"
+                  >提交</van-button
+                >
+                <van-button
+                  style="margin: 0 10px"
+                  type="primary"
+                  round
+                  size="small"
+                  @click="visit(item)"
+                  >拜访</van-button
+                >
+                <van-button round size="small" @click="see(item)" type="info"
+                  >查看</van-button
+                >
+              </div>
             </div>
-          </div>
-          <!-- 提交按钮 -->
-          <div class="move-btn">
-            <van-button
-              round
-              type="danger"
-              size="small"
-              @click="handleClick2(item)"
-              >提交</van-button
-            >
-          </div>
-        </div>
-      </van-cell>
-      </van-list>
+          </van-cell>
+        </van-list>
       </van-pull-refresh>
       <van-overlay :show="show">
         <el-form :model="ruleForm" :rules="rules" ref="ruleForm">
@@ -312,9 +340,10 @@ export default {
       count: "",
       show: false,
       error: false,
-       loading: false,
+      level: 1,
+      loading: false,
       finished: false,
-      isLoading:false,
+      isLoading: false,
       srcList: [],
       expands: [], //只展开一行放入当前行id
       getRowKeys(row) {
@@ -351,11 +380,25 @@ export default {
   },
   mounted() {
     // 获取初始数据
-    this.srcList= []
+    this.srcList = [];
     this.my_data();
+    this.level = localStorage.getItem("level");
   },
   methods: {
     // 添加渠道跳转页面
+    visit(e) {
+      console.log(e);
+      this.$router.push({
+        path: "/visit",
+        query: { itemData: e.id, itemData2: e.type },
+      });
+    },
+    see(e) {
+      this.$router.push({
+        path: "/see_visit",
+        query: { itemData: e.id, itemData2: e.type },
+      });
+    },
     btn(e) {
       this.$router.push({
         name: "see_my",
@@ -365,7 +408,7 @@ export default {
       });
     },
     // 加载更多
-    onLoad(){
+    onLoad() {
       this.page++;
       this.size = 10;
       this.my_data(2);
@@ -373,12 +416,12 @@ export default {
     addBtn() {
       this.$router.push("my_bank");
     },
-    onRefresh(){
-       setTimeout(() => {
-        Toast('刷新成功');
+    onRefresh() {
+      setTimeout(() => {
+        Toast("刷新成功");
         this.page = 1;
         this.size = 10;
-        this.srcList= []
+        this.srcList = [];
         this.my_data();
       }, 1000);
     },
@@ -392,14 +435,13 @@ export default {
       this.fetchGet("/listStaffBank", data).then((res) => {
         if (res.data.code == 0) {
           this.loading = false;
-          if(res.data.data.length == 0){
+          if (res.data.data.length == 0) {
             this.finished = true;
-            return
+            return;
           }
-          this.Mydata = res.data.data
-          if(e == 2){
-          this.Mydata = this.Mydata.concat(res.data.data);
-            
+          this.Mydata = res.data.data;
+          if (e == 2) {
+            this.Mydata = this.Mydata.concat(res.data.data);
           }
           this.count = res.data.count;
           //    获取成功

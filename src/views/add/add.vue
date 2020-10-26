@@ -2,6 +2,10 @@
 .el-input {
   width: 500px;
 }
+.el-select-dropdown__list {
+  display: flex;
+  flex-direction: column;
+}
 .el-select {
   width: 500px;
 }
@@ -48,9 +52,28 @@
       </el-form-item>
 
       <el-form-item label="员工等级" prop="level" required>
-        <el-select v-model="Addata.level" placeholder="请选择员工等级">
+        <el-select
+          v-model="Addata.level"
+          @change="selectOne"
+          placeholder="请选择员工等级"
+        >
           <el-option label="总账户" value="1"></el-option>
           <el-option label="业务员" value="2"></el-option>
+        </el-select>
+      </el-form-item>
+      <el-form-item
+        label="部门名称"
+        :prop="bumen2 == true ? 'prodart' : ''"
+        required
+        v-if="bumen2"
+      >
+        <el-select v-model="Addata.prodart" placeholder="请选择部门名称">
+          <el-option
+            v-for="(item, index) in bumenList"
+            :key="index"
+            :label="item.group_name"
+            :value="item.id"
+          ></el-option>
         </el-select>
       </el-form-item>
       <el-form-item class="btn-form">
@@ -88,6 +111,10 @@ export default {
         phone: "",
         name: "",
         level: "",
+        depart: "",
+        bumen2: false,
+        prodart: "",
+        bumenList: "",
       },
       rules: {
         num: [
@@ -97,6 +124,7 @@ export default {
             trigger: "blur",
           },
         ],
+
         name: [
           {
             required: true,
@@ -111,37 +139,77 @@ export default {
             trigger: "blur",
           },
         ],
+
         level: [
           { required: true, message: "请选择员工等级", trigger: "change" },
         ],
       },
     };
   },
-
+  mounted() {
+    this.bumen();
+  },
   methods: {
+    bumen() {
+      const data = {
+        api_token: localStorage.getItem("tokenlo"),
+      };
+      this.fetchGet("/listGroup", data).then((res) => {
+        if (res.data.code == 0) {
+          this.bumenList = res.data.data;
+        }
+      });
+    },
     close() {
       // 不刷新页面
       this.$router.back();
+    },
+    selectOne(e, i) {
+      if (e == 2) {
+        this.bumen2 = true;
+      } else {
+        this.bumen2 = false;
+      }
     },
     //提交
     Submit() {
       // 添加员工、
       this.$refs.Addata.validate((valid) => {
+        console.log(this.$refs.Addata.validate);
         if (valid) {
-          const data = {
-            staff_num: this.Addata.num,
-            staff_name: this.Addata.name,
-            api_token: localStorage.getItem("tokenlo"),
-            staff_phone: this.Addata.phone,
-            staff_level: this.Addata.level,
-          };
-          this.fetchPost("/addstaff", data).then((res) => {
-            if (res.data.code == 0) {
-              // 添加成功并返回上一页 刷新上一页数据
-              Toast("添加成功");
-              this.$router.go(-1);
-            }
-          });
+          if (this.bumen2 == true) {
+            console.log(1232132);
+            const data = {
+              staff_num: this.Addata.num,
+              staff_name: this.Addata.name,
+              api_token: localStorage.getItem("tokenlo"),
+              staff_phone: this.Addata.phone,
+              staff_level: this.Addata.level,
+              group_id: this.Addata.prodart,
+            };
+            this.fetchPost("/addstaff", data).then((res) => {
+              if (res.data.code == 0) {
+                // 添加成功并返回上一页 刷新上一页数据
+                Toast("添加成功");
+                this.$router.go(-1);
+              }
+            });
+          } else {
+            const data = {
+              staff_num: this.Addata.num,
+              staff_name: this.Addata.name,
+              api_token: localStorage.getItem("tokenlo"),
+              staff_phone: this.Addata.phone,
+              staff_level: this.Addata.level,
+            };
+            this.fetchPost("/addstaff", data).then((res) => {
+              if (res.data.code == 0) {
+                // 添加成功并返回上一页 刷新上一页数据
+                Toast("添加成功");
+                this.$router.go(-1);
+              }
+            });
+          }
         }
       });
     },

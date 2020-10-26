@@ -1,4 +1,4 @@
-<style lang="less" >
+<style lang="less" scoped>
 .top-btn {
   display: flex;
   flex-direction: row;
@@ -6,6 +6,14 @@
   .el-date-editor {
     margin: 0 20px;
   }
+}
+.el-pagination {
+  display: flex;
+  justify-content: center;
+  margin-top: 30px;
+}
+.van-overlay {
+  z-index: 9999;
 }
 
 .blue {
@@ -49,7 +57,7 @@
     display: flex;
     flex-direction: row;
     margin: 5px 0;
-    
+
     .box-text {
       display: flex;
       flex: 1;
@@ -101,7 +109,7 @@
       background-color: #ee0a24;
       color: #fff;
       padding: 10px;
-    border-radius: 50px;
+      border-radius: 50px;
     }
   }
 }
@@ -109,6 +117,11 @@
 .inquiryleft {
   width: 100%;
   flex-wrap: wrap;
+}
+
+.header-box-list {
+  font-weight: 600;
+  line-height: 30px;
 }
 </style>
 
@@ -147,6 +160,9 @@
         <el-table-column prop="money" label="成交金额"> </el-table-column>
         <el-table-column prop="remarks" label="成交备注"> </el-table-column>
         <el-table-column prop="add_time" label="成交时间"> </el-table-column>
+        <el-table-column prop="add_time" label="成交时间"> </el-table-column>
+        <el-table-column prop="staff_name" label="负责人" v-if="level == 1">
+        </el-table-column>
         <el-table-column label="状态">
           <template slot-scope="scope">
             <div v-if="scope.row.status == 1">成交</div>
@@ -204,19 +220,28 @@
       </el-dialog>
     </div>
     <div class="max-width">
-      
       <!-- 头部 -->
       <div class="header-list">
-          <div class="list-box"> <van-dropdown-menu>
-      <van-dropdown-item  v-model="value_type"
-          :options="option1"
-          @change="change1"/>
-      </van-dropdown-menu></div>
-          <div class="list-box" @click="show = true"><span class="el-icon-date"></span>{{startTime ==''?'开始时间':startTime}}</div>
-          <div class="list-box" @click="show2 = true"><span class="el-icon-date"></span>{{endTime ==''?'结束时间':endTime}}</div>
+        <div class="list-box">
+          <van-dropdown-menu>
+            <van-dropdown-item
+              v-model="value_type"
+              :options="option1"
+              @change="change1"
+            />
+          </van-dropdown-menu>
+        </div>
+        <div class="list-box" @click="show = true">
+          <span class="el-icon-date"></span
+          >{{ startTime == "" ? "开始时间" : startTime }}
+        </div>
+        <div class="list-box" @click="show2 = true">
+          <span class="el-icon-date"></span
+          >{{ endTime == "" ? "结束时间" : endTime }}
+        </div>
       </div>
-     
- <van-calendar
+
+      <van-calendar
         v-model="show"
         :round="false"
         position="right"
@@ -226,78 +251,94 @@
         v-model="show2"
         :round="false"
         position="right"
-         @confirm="onConfirm2"
-
+        @confirm="onConfirm2"
       />
-      
+      <div class="quiry-box">
+        <van-pull-refresh v-model="refreshing" @refresh="onRefresh">
+          <van-list
+            v-model="loading"
+            :error.sync="error"
+            error-text="请求失败，点击重新加载"
+            :finished="finished"
+            finished-text="没有更多了"
+            @load="onLoad"
+          >
+            <van-cell v-for="(item, index) in DataList" :key="index">
+              <div class="box-list">
+                <div class="header-box-list" v-if="level == 1">
+                  {{ item.staff_name }}
+                </div>
+              </div>
+              <div class="box-list">
+                <div class="box-text">
+                  <span>银行名称:</span>{{ item.bank_name }}
+                </div>
+                <div class="box-text">
+                  <span>成交时间:</span>{{ item.add_time }}
+                </div>
+              </div>
+              <div class="box-list">
+                <div class="box-text">
+                  <span>渠道名称:</span>{{ item.channel_name }}
+                </div>
+                <div class="box-text">
+                  <span>成交金额:</span>{{ item.money }}
+                </div>
+              </div>
+              <div class="box-list">
+                <div class="box-text">
+                  <span>客户名称:</span>{{ item.clients_user }}
+                </div>
+                <div class="box-text">
+                  <span>成交备注:</span>{{ item.remarks }}
+                </div>
+              </div>
+              <!-- 如果状态未未提交显示提交按钮 -->
+              <div class="box-btn" v-if="item.status == 2">
+                <el-button type="text" @click="dblclick(item, index)"
+                  >提交</el-button
+                >
+              </div>
+            </van-cell>
+          </van-list>
+        </van-pull-refresh>
+        <!--模态框  -->
+        <van-overlay :show="yidong">
+          <div class="wrapper">
+            <el-form :model="ruleForm" :rules="rules" ref="ruleForm">
+              <el-form-item prop="clients_user">
+                <el-input
+                  v-model="ruleForm.clients_user"
+                  placeholder="请输入客户姓名"
+                ></el-input>
+              </el-form-item>
+
+              <el-form-item prop="money">
+                <el-input
+                  v-model="ruleForm.money"
+                  placeholder="请输入成交金额"
+                ></el-input>
+              </el-form-item>
+              <el-form-item prop="remarks">
+                <el-input
+                  v-model="ruleForm.remarks"
+                  type="textarea"
+                  placeholder="请输入成交备注"
+                ></el-input>
+              </el-form-item>
+
+              <el-form-item class="btn">
+                <el-button @click="clonequ">取 消</el-button>
+                <el-button type="primary" @click="determine('ruleForm')"
+                  >确 定</el-button
+                >
+              </el-form-item>
+            </el-form>
+          </div>
+        </van-overlay>
+      </div>
     </div>
     <!-- 下拉刷新 -->
-    <div class="quiry-box">
-      <van-pull-refresh v-model="refreshing" @refresh="onRefresh">
-        <van-list
-  v-model="loading"
-  :error.sync="error"
-  error-text="请求失败，点击重新加载"
-   :finished="finished"
-  finished-text="没有更多了"
-  @load="onLoad"
->
-     <van-cell v-for="(item,index) in DataList" :key="index">
-       <div class="box-list">
-         <div class="box-text"><span>银行名称:</span>{{item.bank_name}}</div>
-         <div class="box-text"><span>成交时间:</span>{{item.add_time}}</div>
-       </div>
-       <div class="box-list">
-         <div class="box-text"><span>渠道名称:</span>{{item.channel_name}}</div>
-         <div class="box-text"><span>成交金额:</span>{{item.money}}</div>
-       </div>
-       <div class="box-list">
-         <div class="box-text"><span>客户名称:</span>{{item.clients_user}}</div>
-         <div class="box-text"><span>成交备注:</span>{{item.remarks}}</div>
-       </div>
-       <!-- 如果状态未未提交显示提交按钮 -->
-       <div class="box-btn" v-if="item.status==2">
-         <el-button type="text" @click="dblclick(item, index)"
-                  >提交</el-button>
-       </div>
-     </van-cell>
-        </van-list>
-  </van-pull-refresh>
-     <!--模态框  -->
-     <van-overlay :show="yidong">
-  <div class="wrapper" >
-      <el-form :model="ruleForm" :rules="rules" ref="ruleForm">
-          <el-form-item prop="clients_user">
-            <el-input
-              v-model="ruleForm.clients_user"
-              placeholder="请输入客户姓名"
-            ></el-input>
-          </el-form-item>
-
-          <el-form-item prop="money">
-            <el-input
-              v-model="ruleForm.money"
-              placeholder="请输入成交金额"
-            ></el-input>
-          </el-form-item>
-          <el-form-item prop="remarks">
-            <el-input
-              v-model="ruleForm.remarks"
-              type="textarea"
-              placeholder="请输入成交备注"
-            ></el-input>
-          </el-form-item>
-
-          <el-form-item class="btn">
-            <el-button @click="clonequ">取 消</el-button>
-            <el-button type="primary" @click="determine('ruleForm')"
-              >确 定</el-button
-            >
-          </el-form-item>
-        </el-form>
-  </div>
-</van-overlay>
-     </div>
   </div>
 </template>
 <script>
@@ -306,13 +347,14 @@ export default {
   data() {
     return {
       loading: false,
-      refreshing:false,
+      refreshing: false,
       finished: false,
       startTime: "",
       endTime: "",
-      yidong:false,
+      yidong: false,
       date2: "",
       type: "",
+      level: 1,
       option1: [
         { text: "全部", value: "" },
         { text: "银行", value: 1 },
@@ -351,6 +393,7 @@ export default {
   mounted() {
     // 获取数据
     this.quiryList();
+    this.level = localStorage.getItem("level");
   },
   methods: {
     onRefresh() {
@@ -359,27 +402,27 @@ export default {
         this.value_type = "";
         this.startTime = "";
         this.endTime = "";
-        this.page =1;
+        this.page = 1;
         this.size = 10;
         this.quiryList();
       }, 1000);
     },
-  // 提交
-  dblclick(e,index){
-    this.yidong= true;
-     this.ruleForm.money = e.money;
+    // 提交
+    dblclick(e, index) {
+      this.yidong = true;
+      this.ruleForm.money = e.money;
       this.ruleForm.remarks = e.remarks;
       this.ruleForm.clients_user = e.clients_user;
       this.id = e.id;
-  },
+    },
     // 加载更多
-    onLoad(){
+    onLoad() {
       this.page++;
       this.size = 10;
-      this.quiryList(2)
+      this.quiryList(2);
     },
     change1(e) {
-      this.page =1;
+      this.page = 1;
       this.quiryList();
     },
     formatDate(date) {
@@ -417,23 +460,22 @@ export default {
       };
       this.fetchGet("/listDeal", data).then((res) => {
         if (res.data.code == 0) {
-          if(res.data.data.length == 0){
+          if (res.data.data.length == 0) {
             this.finished = true;
           }
-          if(e == 2){
-            this.DataList = this.DataList.concat(res.data.data)
-          }else {
-          this.DataList = res.data.data;
-
+          if (e == 2) {
+            this.DataList = this.DataList.concat(res.data.data);
+          } else {
+            this.DataList = res.data.data;
           }
-        this.refreshing = false;
-          
+          this.refreshing = false;
+
           this.count = res.data.count;
           this.DataList.forEach((element) => {
             console.log(element.channel_name);
           });
-        }else {
-          this.error  = true;
+        } else {
+          this.error = true;
         }
       });
     },
@@ -486,7 +528,7 @@ export default {
       this.ruleForm.money = "";
       this.ruleForm.remarks = "";
       this.ruleForm.clients_user = "";
-      this.yidong  = false;
+      this.yidong = false;
       this.id = "";
     },
     // 分页

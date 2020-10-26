@@ -5,6 +5,9 @@
   justify-content: space-between;
   align-items: center;
 }
+.el-pagination__sizes {
+  margin-right: 43px;
+}
 .van-cell {
   display: block;
   margin: 10px 0;
@@ -32,6 +35,8 @@
     <!-- 按钮显示添加用户 -->
     <div class="min-width">
       <el-button type="primary" @click="addBtn()">添加用户</el-button>
+      <el-button type="primary" @click="addBtn2()">添加部门</el-button>
+      <el-button type="primary" @click="addBtn3()">查看部门</el-button>
       <!-- pc端表格显示用户 -->
       <el-table :data="staffData" style="width: 100%" height="70vh">
         <el-table-column prop="staff_num" min-width="120" label="员工账号">
@@ -40,6 +45,7 @@
         </el-table-column>
         <el-table-column prop="staff_phone" min-width="120" label="员工手机号">
         </el-table-column>
+
         <el-table-column label="操作">
           <template slot-scope="scope">
             <el-button
@@ -65,6 +71,8 @@
     </div>
     <!-- 移动端联系人 -->
     <div class="max-width">
+      <el-button type="primary" @click="addBtn2()">添加部门</el-button>
+      <el-button type="primary" @click="addBtn3()">查看部门</el-button>
       <!-- 浮动按钮 -->
       <div @click="addBtn()">
         <floatIng ref="componentref"></floatIng>
@@ -191,6 +199,13 @@ export default {
     addBtn() {
       // 添加增加页面
       this.$router.push("add");
+    },
+    addBtn2() {
+      // 添加部门
+      this.$router.push("bumen");
+    },
+    addBtn3() {
+      this.$router.push("chakan");
     },
 
     // 分页

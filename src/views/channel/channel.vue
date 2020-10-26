@@ -127,9 +127,17 @@
   width: 80%;
   padding: 20px;
 }
+.el-select-dropdown {
+  z-index: 99999 !important;
+}
 @media screen and (max-width: 768px) {
   .el-select {
     margin-bottom: 21px;
+    width: 100%;
+  }
+
+  .v-modal {
+    display: none !important;
   }
 }
 </style>
@@ -193,6 +201,14 @@
           min-width="180"
         >
         </el-table-column>
+
+        <el-table-column prop="company_scale" label="公司规模" min-width="180">
+        </el-table-column>
+        <el-table-column label="公司性质" min-width="120">
+          <template slot-scope="scope">
+            {{ scope.row.company_nature == 1 ? "电销" : "行销" }}
+          </template>
+        </el-table-column>
         <el-table-column
           prop="channel_phone"
           label="联系人电话"
@@ -206,16 +222,33 @@
         >
         </el-table-column>
         <el-table-column
+          prop="staff_name"
+          label="负责人"
+          min-width="120"
+          v-if="level == 1"
+        >
+        </el-table-column>
+        <el-table-column
           prop="deal_num"
           sortable
           label="成交笔"
           min-width="120"
         >
         </el-table-column>
-        <el-table-column fixed="right" label="操作" min-width="120">
+        <el-table-column fixed="right" label="操作" min-width="160">
           <template slot-scope="scope">
             <el-button @click="handleClick(scope.row)" type="text" size="small"
               >提交</el-button
+            >
+            <el-button
+              type="text"
+              size="small"
+              style="margin 0 10px"
+              @click="visit(scope.row)"
+              >拜访</el-button
+            >
+            <el-button type="text" size="small" @click="see(scope.row)"
+              >查看</el-button
             >
           </template>
         </el-table-column>
@@ -249,6 +282,12 @@
           <el-input
             v-model="ruleForm.money"
             placeholder="请输入成交金额"
+          ></el-input>
+        </el-form-item>
+        <el-form-item prop="user_phone">
+          <el-input
+            v-model="ruleForm.user_phone"
+            placeholder="请输入手机号"
           ></el-input>
         </el-form-item>
         <el-form-item prop="region">
@@ -297,7 +336,12 @@
             placeholder="请输入成交金额"
           ></el-input>
         </el-form-item>
-
+        <el-form-item prop="user_phone2">
+          <el-input
+            v-model="ruleForm2.user_phone2"
+            placeholder="请输入手机号"
+          ></el-input>
+        </el-form-item>
         <el-form-item prop="remarks2">
           <el-input
             v-model="ruleForm2.remarks2"
@@ -331,6 +375,12 @@
               <el-input
                 v-model="ruleForm.money"
                 placeholder="请输入成交金额"
+              ></el-input>
+            </el-form-item>
+            <el-form-item prop="user_phone">
+              <el-input
+                v-model="ruleForm.user_phone"
+                placeholder="请输入手机号"
               ></el-input>
             </el-form-item>
             <el-form-item prop="region">
@@ -386,6 +436,13 @@
                     <span>{{ item.channel_position }}</span>
                     <span>{{ item.channel_phone }}</span>
                   </div>
+                  <div class="move-name">
+                    <span v-if="level == 1">{{ item.staff_name }}</span>
+                    <span>{{
+                      item.company_nature == 1 ? "电销" : "行销"
+                    }}</span>
+                    <span>{{ item.company_scale }}</span>
+                  </div>
                   <!-- 成交笔 -->
                   <div class="move-num">
                     {{ item.deal_num }}
@@ -400,6 +457,17 @@
                   size="small"
                   @click="handleClick(item)"
                   >提交</van-button
+                >
+                <van-button
+                  style="margin: 0 10px"
+                  type="primary"
+                  round
+                  size="small"
+                  @click="visit(item)"
+                  >拜访</van-button
+                >
+                <van-button round size="small" @click="see(item)" type="info"
+                  >查看</van-button
                 >
               </div>
             </div>
@@ -418,7 +486,23 @@
 <script>
 import { Toast } from "vant";
 import floatIng from "../float/float";
-
+var checkPhone = (rule, value, callback) => {
+  const phoneReg = /^1[3|4|5|6|7|8][0-9]{9}$/;
+  if (!value) {
+    return callback(new Error("电话号码不能为空"));
+  }
+  setTimeout(() => {
+    if (!Number.isInteger(+value)) {
+      callback(new Error("请输入数字值"));
+    } else {
+      if (phoneReg.test(value)) {
+        callback();
+      } else {
+        callback(new Error("手机号码格式不正确"));
+      }
+    }
+  }, 100);
+};
 export default {
   components: {
     floatIng,
@@ -429,6 +513,7 @@ export default {
       loading: false,
       finished: false,
       dialogVisible2: false,
+      level: "1",
       refreshing: false,
       expands: [], //只展开一行放入当前行id
       isLoading: false,
@@ -451,14 +536,19 @@ export default {
         remarks: "",
         clients_user: "",
         region: "",
+        user_phone: "",
       },
       ruleForm2: {
         money2: "",
         remarks2: "",
         clients_user2: "",
+        user_phone2: "",
       },
       id2: "",
       rules: {
+        user_phone: [
+          { required: true, validator: checkPhone, trigger: "blur" },
+        ],
         region: [
           { required: true, message: "请选择状态码", trigger: "change" },
         ],
@@ -471,6 +561,9 @@ export default {
         ],
       },
       rules2: {
+        user_phone2: [
+          { required: true, validator: checkPhone, trigger: "blur" },
+        ],
         region2: [
           { required: true, message: "请选择状态码", trigger: "change" },
         ],
@@ -490,14 +583,33 @@ export default {
   },
   mounted() {
     this.DataList();
+    this.level = localStorage.getItem("level");
+    console.log(this.level);
   },
   methods: {
     dblclick(e, i) {
+      console.log(e);
       this.dialogVisible2 = true;
       this.id2 = e.id;
       this.ruleForm2.money2 = e.money;
       this.ruleForm2.clients_user2 = e.clients_user;
       this.ruleForm2.remarks2 = e.remarks;
+      this.ruleForm2.user_phone2 = e.user_phone;
+    },
+
+    // 点击拜访
+    visit(e) {
+      console.log(e);
+      this.$router.push({
+        path: "/visit",
+        query: { itemData: e.id, itemData2: e.type },
+      });
+    },
+    see(e) {
+      this.$router.push({
+        path: "/see_visit",
+        query: { itemData: e.id, itemData2: e.type },
+      });
     },
     // 下拉刷新
     onRefresh() {
@@ -597,6 +709,7 @@ export default {
       this.ruleForm2.remarks2 = "";
       this.ruleForm2.clients_user2 = "";
       this.id2 = "";
+      this.ruleForm2.user_phone2 = "";
     },
     // 点击取消按钮
     clonequ() {
@@ -609,6 +722,9 @@ export default {
       this.ruleForm2.remarks2 = "";
       this.ruleForm2.clients_user2 = "";
       this.id2 = "";
+      this.ruleForm.region = "";
+      this.ruleForm.region2 = "";
+      this.ruleForm.user_phone = "";
     },
     determine2(ruleForm) {
       this.$refs[ruleForm].validate((valid) => {
@@ -619,6 +735,7 @@ export default {
             remarks: this.ruleForm2.remarks2,
             money: this.ruleForm2.money2,
             clients_user: this.ruleForm2.clients_user2,
+            user_phone: this.ruleForm2.user_phone2,
           };
           this.fetchGet("/editDeal", data).then((res) => {
             if (res.data.code == 0) {
@@ -627,6 +744,9 @@ export default {
               this.ruleForm2.money2 = "";
               this.ruleForm2.remarks2 = "";
               this.ruleForm2.clients_user2 = "";
+              this.ruleForm.region = "";
+              this.ruleForm.region2 = "";
+              this, (this.ruleForm2.user_phone2 = "");
               //    获取成功
             } else {
             }
@@ -646,6 +766,7 @@ export default {
             remarks: this.ruleForm.remarks,
             money: this.ruleForm.money,
             clients_user: this.ruleForm.clients_user,
+            user_phone: this.ruleForm.user_phone,
           };
           this.fetchGet("/staffDeal", data).then((res) => {
             if (res.data.code == 0) {
@@ -654,6 +775,9 @@ export default {
               this.ruleForm.money = "";
               this.ruleForm.remarks = "";
               this.ruleForm.clients_user = "";
+              this.ruleForm.region = "";
+              this.ruleForm.region2 = "";
+              this.ruleForm.user_phone = "";
               //    获取成功
             } else {
               Toast(res.message);

@@ -77,6 +77,18 @@
           placeholder="请输入联系人职位"
         ></el-input>
       </el-form-item>
+      <el-form-item label="公司规模" prop="scale" required>
+        <el-input
+          v-model="ruleForm.scale"
+          placeholder="请输入公司规模"
+        ></el-input>
+      </el-form-item>
+      <el-form-item label="公司性质" prop="nature" required>
+        <el-select v-model="ruleForm.nature" placeholder="请选择公司性质">
+          <el-option label="电销" value="1"></el-option>
+          <el-option label="行销" value="2"></el-option>
+        </el-select>
+      </el-form-item>
       <el-form-item label="联系人电话" prop="channel_phone">
         <el-input
           v-model="ruleForm.channel_phone"
@@ -142,6 +154,8 @@ export default {
         channel_user_name: "",
         channel_position: "",
         imageUrl: "",
+        scale: "",
+        nature: "",
       },
       rules: {
         channel_name: [
@@ -161,8 +175,14 @@ export default {
             trigger: "blur",
           },
         ],
+        nature: [
+          { required: true, message: "请选择公司性质", trigger: "change" },
+        ],
         channel_position: [
           { required: true, message: "联系人职位不能为空", trigger: "blur" },
+        ],
+        scale: [
+          { required: true, message: "公司规模不能为空", trigger: "blur" },
         ],
         imageUrl: [
           {
@@ -209,6 +229,8 @@ export default {
             channel_phone: this.ruleForm.channel_phone,
             channel_user_name: this.ruleForm.channel_user_name,
             channel_img: this.ruleForm.imageUrl,
+            company_nature: this.ruleForm.nature,
+            company_scale: this.ruleForm.scale,
           };
           this.fetchPost("/addStaffChannel", data).then((res) => {
             if (res.data.code == 0) {
