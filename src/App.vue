@@ -20,5 +20,9 @@ export default {
 }
 .el-form-item__content {
   width: 100%;
+}@media screen and (max-width: 768px) {
+.el-message-box {
+  width: 80% !important;
+}
 }
 </style>

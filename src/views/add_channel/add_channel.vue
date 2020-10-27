@@ -34,10 +34,10 @@
 // 多媒体查询
 @media screen and (max-width: 768px) {
   .el-input {
-    width: 100%;
+    width: 70%;
   }
   .el-select {
-    width: 100%;
+    width: 70%;
   }
   .el-button {
     width: 100%;

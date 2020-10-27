@@ -14,6 +14,8 @@
 }
 .van-overlay {
   z-index: 9999;
+  display: flex;
+  justify-content: center;
 }
 
 .blue {
@@ -37,7 +39,7 @@
     width: 100%;
   }
   .wrapper {
-    width: 100%;
+    width: 80%;
     height: 100%;
     display: flex;
     justify-content: center;
@@ -82,7 +84,7 @@
     position: fixed;
     top: 62px;
     left: 0;
-    z-index: 999;
+    z-index: 29;
     width: 100%;
   }
   .list-box {

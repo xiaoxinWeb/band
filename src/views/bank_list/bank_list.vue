@@ -42,6 +42,8 @@
   justify-content: space-between;
   color: #000;
   line-height: 30px;
+   width: 80%;
+  margin: 10px 0 ;
 }
 .delect {
   color: red;
@@ -51,6 +53,9 @@
 }
 
 @media screen and (max-width: 768px) {
+  .el-message-box {
+    width: 80% !important;
+  }
   .wrapper {
     display: flex;
     align-items: center;
@@ -73,6 +78,22 @@
 .right-text {
   color: red;
   margin-right: 10px;
+}
+.list-item {
+  display: flex;
+  flex-direction: row;
+  justify-content: space-between;
+  position: relative;
+}
+
+.left-delect {
+  margin-right: 30px;
+  color: red;
+}
+.van-icon {
+  position: absolute;
+  right: 0;
+  top: 5px;
 }
 </style>
 <template>
@@ -154,7 +175,35 @@
 
     <!-- 移动端  -->
     <div class="max-width">
-      <van-collapse v-model="activeNames" accordion>
+ <van-list
+  v-model="loading"
+  :finished="finished"
+  finished-text="没有更多了"
+   @load="onLoad"
+>
+ <van-cell v-for="(item,index) in tableData" :mode="item" :key="index" >
+   <div >
+     <!-- 左边内容 -->
+     <div class="list-item">
+     <div class="left-item">
+       {{item.bank_name}}
+     </div>
+     <div class="left-delect" @click="delect2(item)">
+       删除
+     </div>
+     </div>
+     <!-- 图标 -->
+     <van-icon :name="item.istrue?'arrow-up':'arrow-down'" @click="isActive(item,index)"  v-if="item.parent.length !=0"/>
+            <div class="activeList" v-for="(item2,i) in item.parent" :key = "i"  v-show="item.istrue">
+                <span>{{ item2.bank_name }}</span>
+            <span class="delect" @click="delect(idx, item2.id, item.parent)"
+              >删除</span
+            >
+            </div>
+   </div>
+   </van-cell>
+</van-list>
+      <!-- <van-collapse v-model="activeNames" accordion>
         <van-collapse-item
           v-for="(item, index) in tableData"
           :title="item.bank_name"
@@ -167,7 +216,7 @@
             >
           </div>
         </van-collapse-item>
-      </van-collapse>
+      </van-collapse> -->
       <div @click="addBtn2()">
         <floatIng ref="componentref"></floatIng>
       </div>
@@ -214,11 +263,16 @@ import floatIng from "../float/float";
 export default {
   components: {
     floatIng,
+
   },
   data() {
     return {
       tableData: "",
+      isActive_false:false,
+      finished:false,
       selectList: "",
+      loading:false,
+      isLoading:true,
       show: false,
       activeNames: ["1"],
       page: 1,
@@ -243,6 +297,11 @@ export default {
     this.btnsectClick();
   },
   methods: {
+    // 点击展开收起 
+    isActive(item,index){
+      item.istrue = !item.istrue
+        //  this.tableData = this.tableData
+    },
     // 获取一级菜单数据
     btnsectClick() {
       const data = {
@@ -257,6 +316,8 @@ export default {
         }
       });
     },
+    // 加载数据
+ 
     addBtn2() {
       this.show = true;
     },
@@ -298,10 +359,20 @@ export default {
     handleEdit(index, row) {
       console.log(index, row);
     },
+    // 刷新 
+    onRefresh(){
+      this.page = 1;
+      this.Banklist();
+
+    },
+    onLoad(){
+      this.page ++;
+      this.Banklist(2);
+    },
     handleDelete(index, row) {
       console.log(index, row);
     },
-    Banklist() {
+    Banklist(e) {
       const data = {
         api_token: localStorage.getItem("tokenlo"),
         page: this.page,
@@ -309,12 +380,26 @@ export default {
       };
       this.fetchGet("/listBank", data).then((res) => {
         if (res.data.code == 0) {
-          console.log(res);
+          this.loading = false
+          if (e == 2) {
+            if (res.data.data.length == 0) {
+              this.finished = true;
+            } else {
+              this.tableData = this.tableData.concat(res.data.data);
+              this.finished = false;
+            }
+            return;
+          }
           this.tableData = res.data.data;
+         
+          console.log(this.tableData)
           this.count = res.data.count;
           //    获取成功
         }
       });
+    },
+    delect3(item){
+
     },
     // 删除
     delect2(item) {

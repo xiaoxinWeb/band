@@ -39,6 +39,9 @@
   .el-select {
     width: 100%;
   }
+  .el-textarea {
+    width: 70%;
+  }
   .ele-st {
     margin-top: 20px;
   }
