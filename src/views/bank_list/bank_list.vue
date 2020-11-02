@@ -181,6 +181,7 @@
   finished-text="没有更多了"
    @load="onLoad"
 >
+<van-pull-refresh  v-model="isLoading" @refresh="onRefresh">
  <van-cell v-for="(item,index) in tableData" :mode="item" :key="index" >
    <div >
      <!-- 左边内容 -->
@@ -202,6 +203,7 @@
             </div>
    </div>
    </van-cell>
+   </van-pull-refresh>
 </van-list>
       <!-- <van-collapse v-model="activeNames" accordion>
         <van-collapse-item
@@ -272,7 +274,7 @@ export default {
       finished:false,
       selectList: "",
       loading:false,
-      isLoading:true,
+      isLoading:false,
       show: false,
       activeNames: ["1"],
       page: 1,
@@ -381,6 +383,7 @@ export default {
       this.fetchGet("/listBank", data).then((res) => {
         if (res.data.code == 0) {
           this.loading = false
+          this.isLoading = false;
           if (e == 2) {
             if (res.data.data.length == 0) {
               this.finished = true;
@@ -391,8 +394,6 @@ export default {
             return;
           }
           this.tableData = res.data.data;
-         
-          console.log(this.tableData)
           this.count = res.data.count;
           //    获取成功
         }

@@ -102,6 +102,12 @@
           placeholder="请输入银行联系人"
         ></el-input>
       </el-form-item>
+      <el-form-item label="银行职位" prop="bank_position">
+        <el-input
+          v-model="bankaddData.bank_position"
+          placeholder="请输入银行职位"
+        ></el-input>
+      </el-form-item>
       <el-form-item label="联系电话" prop="bank_rersonnel_phone">
         <el-input
           v-model="bankaddData.bank_rersonnel_phone"
@@ -157,6 +163,7 @@ export default {
         selectListA: "",
         selectList1: "",
         selectList2: "",
+        bank_position:"",
       },
       rules: {
         selectList2: [
@@ -178,7 +185,13 @@ export default {
             trigger: "blur",
           },
         ],
-
+        bank_position:[
+          {
+            required: true,
+            message: "银行职位不能为空",
+            trigger: "blur",
+          },
+        ],
         imageUrl: [
           {
             required: true,
@@ -249,6 +262,7 @@ export default {
             bank_rersonnel_name: this.bankaddData.bank_rersonnel_name,
             bank_rersonnel_phone: this.bankaddData.bank_rersonnel_phone,
             bank_img: this.bankaddData.imageUrl,
+            bank_position:this.bankaddData.bank_position
           };
           this.fetchPost("/addStaffBank", data).then((res) => {
             if (res.data.code == 0) {

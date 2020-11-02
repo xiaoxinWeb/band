@@ -142,18 +142,21 @@
             </el-image>
           </template>
         </el-table-column>
-        <el-table-column prop="add_time" label="时间"> </el-table-column>
-        <el-table-column prop="bank_rersonnel_name" label="银行人员名称">
+        <el-table-column prop="add_time" label="时间" min-width="120"> </el-table-column>
+        <el-table-column prop="bank_rersonnel_name" label="银行人员名称" min-width="120">
         </el-table-column>
-        <el-table-column prop="bank_name" label="银行相关名称">
+        <el-table-column prop="bank_name" label="银行相关名称" min-width="120">
         </el-table-column>
-        <el-table-column prop="bank_rersonnel_phone" label="银行人员联系方式">
+        <el-table-column prop="bank_rersonnel_phone" label="银行人员联系方式" min-width="160">
         </el-table-column>
-        <el-table-column prop="staff_name" v-if="level == 1" label="负责人">
+         <el-table-column prop="bank_position" label="银行职位" min-width="120">
         </el-table-column>
-        <el-table-column prop="deal_num" sortable label="成交笔数">
+        <el-table-column prop="staff_name" v-if="level == 1" label="负责人" min-width="160">
         </el-table-column>
-        <el-table-column>
+        
+        <el-table-column prop="deal_num" sortable label="成交笔数" min-width="120">
+        </el-table-column>
+        <el-table-column min-width="200"  fixed="right">
           <template slot="header" slot-scope="scope">
             <el-input
               v-model="search"
@@ -162,6 +165,19 @@
             />
           </template>
           <template slot-scope="scope">
+            <el-popconfirm
+  confirmButtonText='确定'
+  @onConfirm="delect(scope.row,scope.$index)"
+  cancelButtonText='取消'
+  icon="el-icon-info"
+  iconColor="red"
+  title="确定要删除了吗？"
+>
+  <el-button slot="reference" type="text" size="small"
+              >删除</el-button
+            >
+</el-popconfirm>
+            
             <el-button @click="handleClick(scope.row)" type="text" size="small"
               >提交</el-button
             >
@@ -257,7 +273,9 @@
                   <div class="move-name">
                     <div v-if="level == 1">{{ item.staff_name }}</div>
                     <div>{{ item.bank_name }}</div>
+                    <span>{{item.bank_position}}</span>
                     <span>{{ item.bank_rersonnel_phone }}</span>
+                    
                   </div>
                   <!-- 成交笔 -->
                   <div class="move-num">{{ item.deal_num }}</div>
@@ -265,8 +283,16 @@
               </div>
               <!-- 提交按钮 -->
               <div class="move-btn">
+                 <van-button
+                  round
+                  type="warning"
+                  size="small"
+                  @click="delect_Back(item,index)"
+                  >删除</van-button
+                >
                 <van-button
                   round
+                   style="margin: 0 0 0 10px"
                   type="danger"
                   size="small"
                   @click="handleClick2(item)"
@@ -329,7 +355,7 @@
   </div>
 </template>
 <script>
-import { Toast } from "vant";
+import { Toast ,Dialog} from "vant";
 import floatIng from "../float/float";
 export default {
   components: {
@@ -515,6 +541,26 @@ export default {
     handleSizeChange(val) {
       this.size = val;
       this.my_data();
+    },
+
+    // 删除
+    delect_Back(e,i){
+      Dialog.confirm({
+    title: '标题',
+    message: '确定要删除么',
+    })
+  .then(() => {
+    this.delect(e,i)
+    // on confirm
+  })
+  .catch(() => {
+    console.log("213123123")
+    // on cancel
+  });
+    },
+    // s删除
+    delect(e,i){
+      this.Mydata.splice(i,1)
     },
     // 提交按钮
     determine(ruleForm) {

@@ -154,16 +154,16 @@
         >
       </div>
       <el-table height="70vh" :data="DataList" style="width: 100%">
-        <el-table-column label="银行名称" prop="bank_name"> </el-table-column>
-        <el-table-column label="渠道名称" prop="channel_name">
+        <el-table-column label="银行名称" prop="bank_name"  min-width="120"> </el-table-column>
+        <el-table-column label="渠道名称" prop="channel_name"  min-width="120">
         </el-table-column>
-        <el-table-column prop="clients_user" label="客户姓名">
+        <el-table-column prop="clients_user" label="客户姓名"  min-width="120">
         </el-table-column>
-        <el-table-column prop="money" label="成交金额"> </el-table-column>
-        <el-table-column prop="remarks" label="成交备注"> </el-table-column>
-        <el-table-column prop="add_time" label="成交时间"> </el-table-column>
-        <el-table-column prop="add_time" label="成交时间"> </el-table-column>
-        <el-table-column prop="staff_name" label="负责人" v-if="level == 1">
+        <el-table-column prop="money" label="成交金额"  min-width="120"> </el-table-column>
+        <el-table-column prop="remarks" label="成交备注"  min-width="120"> </el-table-column>
+        <el-table-column prop="add_time" label="成交时间"  min-width="120"> </el-table-column>
+        <el-table-column prop="add_time" label="成交时间"  min-width="120"> </el-table-column>
+        <el-table-column prop="staff_name" label="负责人" v-if="level == 1"  min-width="120">
         </el-table-column>
         <el-table-column label="状态">
           <template slot-scope="scope">

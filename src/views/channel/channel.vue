@@ -235,11 +235,23 @@
           min-width="120"
         >
         </el-table-column>
-        <el-table-column fixed="right" label="操作" min-width="160">
+        <el-table-column fixed="right" label="操作" min-width="200">
           <template slot-scope="scope">
             <el-button @click="handleClick(scope.row)" type="text" size="small"
               >提交</el-button
             >
+             <el-popconfirm
+  confirmButtonText='确定'
+  @onConfirm="delect(scope.row,scope.$index)"
+  cancelButtonText='取消'
+  icon="el-icon-info"
+  iconColor="red"
+  title="确定要删除了吗？"
+>
+  <el-button slot="reference" type="text" size="small"
+              >删除</el-button
+            >
+</el-popconfirm>
             <el-button
               type="text"
               size="small"
@@ -453,6 +465,14 @@
               <div class="move-btn">
                 <van-button
                   round
+                  type="warning"
+                  size="small"
+                  @click="delect_Back(item,index)"
+                  >删除</van-button
+                >
+                <van-button
+                style="margin: 0 0 0 10px"
+                  round
                   type="danger"
                   size="small"
                   @click="handleClick(item)"
@@ -484,7 +504,7 @@
   </div>
 </template>
 <script>
-import { Toast } from "vant";
+import { Toast ,Dialog} from "vant";
 import floatIng from "../float/float";
 var checkPhone = (rule, value, callback) => {
   const phoneReg = /^1[3|4|5|6|7|8][0-9]{9}$/;
@@ -596,7 +616,25 @@ export default {
       this.ruleForm2.remarks2 = e.remarks;
       this.ruleForm2.user_phone2 = e.user_phone;
     },
-
+ // 删除
+    delect_Back(e,i){
+      Dialog.confirm({
+    title: '标题',
+    message: '确定要删除么',
+    })
+  .then(() => {
+    this.delect(e,i)
+    // on confirm
+  })
+  .catch(() => {
+    console.log("213123123")
+    // on cancel
+  });
+    },
+    // s删除
+    delect(e,i){
+      this.channelData.splice(i,1)
+    },
     // 点击拜访
     visit(e) {
       console.log(e);
