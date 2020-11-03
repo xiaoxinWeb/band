@@ -166,12 +166,13 @@
           </template>
           <template slot-scope="scope">
             <el-popconfirm
+             v-if="level == 1"
   confirmButtonText='确定'
   @onConfirm="delect(scope.row,scope.$index)"
   cancelButtonText='取消'
   icon="el-icon-info"
   iconColor="red"
-  title="确定要删除了吗？"
+  title="删除后，将删除全部自己菜单，确定要删除了吗？"
 >
   <el-button slot="reference" type="text" size="small"
               >删除</el-button
@@ -284,6 +285,7 @@
               <!-- 提交按钮 -->
               <div class="move-btn">
                  <van-button
+                  v-if="level == 1"
                   round
                   type="warning"
                   size="small"
@@ -547,7 +549,7 @@ export default {
     delect_Back(e,i){
       Dialog.confirm({
     title: '标题',
-    message: '确定要删除么',
+    message: '删除后，将删除全部自己菜单，确定要删除了吗?',
     })
   .then(() => {
     this.delect(e,i)
@@ -560,7 +562,21 @@ export default {
     },
     // s删除
     delect(e,i){
-      this.Mydata.splice(i,1)
+      console.log(e)
+      const data = {
+            api_token: localStorage.getItem("tokenlo"),
+            type: 1,
+            id:e.id
+          };
+          this.fetchGet("/delStaffBankChannel", data).then((res) => {
+            if (res.data.code == 0) {
+              this.Mydata.splice(i,1)
+              //    获取成功
+            } else {
+
+            }
+          });
+     
     },
     // 提交按钮
     determine(ruleForm) {

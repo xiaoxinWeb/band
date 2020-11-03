@@ -240,13 +240,13 @@
             <el-button @click="handleClick(scope.row)" type="text" size="small"
               >提交</el-button
             >
-             <el-popconfirm
+             <el-popconfirm v-if="level == 1"
   confirmButtonText='确定'
   @onConfirm="delect(scope.row,scope.$index)"
   cancelButtonText='取消'
   icon="el-icon-info"
   iconColor="red"
-  title="确定要删除了吗？"
+  title="删除后，将删除全部自己菜单，确定要删除了吗？"
 >
   <el-button slot="reference" type="text" size="small"
               >删除</el-button
@@ -464,6 +464,7 @@
               <!-- 提交按钮 -->
               <div class="move-btn">
                 <van-button
+                 v-if="level == 1"
                   round
                   type="warning"
                   size="small"
@@ -620,7 +621,7 @@ export default {
     delect_Back(e,i){
       Dialog.confirm({
     title: '标题',
-    message: '确定要删除么',
+  message: '删除后，将删除全部自己菜单，确定要删除了吗?',
     })
   .then(() => {
     this.delect(e,i)
@@ -633,7 +634,20 @@ export default {
     },
     // s删除
     delect(e,i){
-      this.channelData.splice(i,1)
+      const data = {
+            api_token: localStorage.getItem("tokenlo"),
+            type: 2,
+            id:e.id
+          };
+          this.fetchGet("/delStaffBankChannel", data).then((res) => {
+            if (res.data.code == 0) {
+               this.channelData.splice(i,1)
+              //    获取成功
+            } else {
+
+            }
+          });
+     
     },
     // 点击拜访
     visit(e) {

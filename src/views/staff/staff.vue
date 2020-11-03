@@ -29,6 +29,14 @@
   line-height: 45px;
   height: 45px;
 }
+
+.span_text {
+  color: #000;
+  width:100px;
+  display: inline-block;
+  text-align: right;
+  margin-right: 10px;
+}
 </style>
 <template>
   <div>
@@ -45,8 +53,15 @@
         </el-table-column>
         <el-table-column prop="staff_phone" min-width="120" label="员工手机号">
         </el-table-column>
-
-        <el-table-column label="操作">
+          <el-table-column prop="countBank" min-width="120" label="银行数量">
+        </el-table-column>
+          <el-table-column prop="countBankDeal" min-width="120" label="银行成交数量">
+        </el-table-column>
+          <el-table-column prop="countChannel" min-width="120" label="渠道数量">
+        </el-table-column>
+          <el-table-column prop="countChannelDeal" min-width="120" label="渠道成交数量">
+        </el-table-column>
+        <el-table-column label="操作" fixed="right">
           <template slot-scope="scope">
             <el-button
               class="delect"
@@ -96,6 +111,12 @@
               <div class="staffLeft">
                 <div class="staffNum">{{ item.staff_num }}</div>
                 <div class="staffPhone">{{ item.staff_phone }}</div>
+              </div>
+              <div class="staffLeft">
+                <div class="staffNum"><span class="span_text">银行数量：</span>{{item.countBank}}</div>
+                <div class="staffPhone"><span class="span_text">银行成交数量：</span>{{item.countBankDeal}}</div>
+                <div class="staffPhone"><span class="span_text">渠道数量：</span>{{item.countChannel}}</div>
+                <div class="staffPhone"><span class="span_text">渠道成交数量：</span>{{item.countChannelDeal}}</div>
               </div>
               <!-- 右边删除 -->
               <div class="staffRight">
